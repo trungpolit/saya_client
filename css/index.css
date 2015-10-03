@@ -1,0 +1,308 @@
+﻿#slogan {
+    color: goldenrod;
+    text-align: center;
+}
+
+.slogan-top {
+    margin: 0;
+    font-size:50px;
+}
+
+@font-face {
+  font-family: 'Product Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Product Sans'), local('ProductSans-Regular'), url(fonts/product-sans.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+.slogan-top span.s{
+    font-family:'Product Sans';
+    color: #0037cf;
+}
+
+.slogan-top span.a-first{
+    font-family:'Product Sans';
+    color: #f6ef1b;
+}
+
+.slogan-top span.y{
+    font-family:'Product Sans';
+    color: #00b600;
+}
+
+.slogan-top span.a-last{
+    font-family:'Product Sans';
+    color: #fa5100;
+}
+
+.page-title {
+    font-size:24px;
+}
+.page-title span.s{
+    font-family:'Product Sans';
+    color: #0037cf;
+}
+
+.page-title span.a-first{
+    font-family:'Product Sans';
+    color: #f6ef1b;
+}
+
+.page-title span.y{
+    font-family:'Product Sans';
+    color: #00b600;
+}
+
+.page-title span.a-last{
+    font-family:'Product Sans';
+    color: #fa5100;
+}
+
+#region_submit{
+    border-radius: 25px;
+}
+
+.icon-scale {     
+    height: 42px !important;
+    width: 42px !important;
+}
+
+.icon-scale:after {
+    height: 42px !important;
+    width: 42px !important;
+    margin-left: -21px;
+    margin-top: -21px; 
+}
+
+/*.ui-icon-bars:after {
+    background-size:32px 32px;
+}*/
+
+/* Panel */
+.ui-panel {
+	width: 13em;
+	min-height: 100%;
+	max-height: none;
+	border-width: 0;
+	position: absolute;
+	top: 0;
+	display: block;
+}
+.ui-panel-closed {
+	width: 0;
+	max-height: 100%;
+	overflow: hidden;
+	visibility: hidden;
+	left: 0;
+	clip: rect(1px,1px,1px,1px);
+}
+.ui-panel-fixed {
+	position: fixed;
+	bottom: -1px; /* Fixes gap on Chrome for Android */
+	padding-bottom: 1px;
+}
+.ui-panel-display-reveal {
+	z-index: 1;
+}
+.ui-panel-display-push {
+	z-index: 999;
+}
+.ui-panel-display-overlay {
+	z-index: 1001; /* Fixed toolbars have z-index 1000 */
+}
+.ui-panel-inner {
+	padding: 1em;
+}
+/* Container, page and wrapper */
+.ui-panel-page-container {
+	overflow-x: visible;
+}
+.ui-panel-page-container-themed .ui-page-active {
+	background: none;
+}
+.ui-panel-wrapper {
+	position: relative;
+	min-height: inherit;
+	border: 0;
+	overflow-x: hidden;
+	z-index: 999;
+}
+/* Fixed toolbars */
+.ui-panel-fixed-toolbar {
+	overflow-x: hidden;
+}
+/* Dismiss */
+.ui-panel-dismiss {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 100%;
+	z-index: 1002;
+	display: none;
+}
+.ui-panel-dismiss-open {
+	display: block;
+}
+/* Animate class is added to panel, wrapper and fixed toolbars */
+.ui-panel-animate {
+	-webkit-transition: -webkit-transform 300ms ease;
+	-webkit-transition-duration: 300ms;
+	-moz-transition: -moz-transform 300ms ease;
+	transition: transform 300ms ease;
+}
+/* Fix for Windows Phone issue #6349: unset the transition for transforms in case of fixed toolbars. */
+@media screen and ( max-device-width: 768px ) {
+	.ui-page-header-fixed .ui-panel-animate.ui-panel-wrapper,
+	.ui-page-footer-fixed .ui-panel-animate.ui-panel-wrapper,
+	.ui-panel-animate.ui-panel-fixed-toolbar {
+		-ms-transition: none;
+	}
+	/* We need a transitionend event ... */
+	.ui-panel-animate.ui-panel-fixed-toolbar {
+		-ms-transition: -ms-transform 1ms;
+		-ms-transform: rotate(0deg);
+	}
+}
+/* Hardware acceleration for smoother transitions on WebKit browsers */
+.ui-panel-animate.ui-panel:not(.ui-panel-display-reveal) {
+	-webkit-backface-visibility: hidden;
+	-webkit-transform: translate3d(0,0,0);
+}
+/* Panel positioning (for overlay and push) */
+/* Panel left closed */
+.ui-panel-position-left {
+	left: -13em;
+}
+/* Panel left closed animated */
+.ui-panel-animate.ui-panel-position-left.ui-panel-display-overlay,
+.ui-panel-animate.ui-panel-position-left.ui-panel-display-push {
+	left: 0;
+	-webkit-transform: translate3d(-13em,0,0);
+	-moz-transform: translate3d(-13em,0,0);
+	transform: translate3d(-13em,0,0);
+}
+/* Panel left open */
+.ui-panel-position-left.ui-panel-display-reveal, /* Unset "panel left closed" for reveal */
+.ui-panel-open.ui-panel-position-left {
+	left: 0;
+}
+/* Panel left open animated */
+.ui-panel-animate.ui-panel-open.ui-panel-position-left.ui-panel-display-overlay,
+.ui-panel-animate.ui-panel-open.ui-panel-position-left.ui-panel-display-push {
+	-webkit-transform: translate3d(0,0,0);
+	transform: translate3d(0,0,0);
+	-moz-transform: none;
+}
+/* Panel right closed */
+.ui-panel-position-right {
+	right: -13em;
+}
+/* Panel right closed animated */
+.ui-panel-animate.ui-panel-position-right.ui-panel-display-overlay,
+.ui-panel-animate.ui-panel-position-right.ui-panel-display-push {
+	right: 0;
+	-webkit-transform: translate3d(13em,0,0);
+	-moz-transform: translate3d(13em,0,0);
+	transform: translate3d(13em,0,0);
+}
+/* Panel right open */
+.ui-panel-position-right.ui-panel-display-reveal, /* Unset "panel right closed" for reveal */
+.ui-panel-position-right.ui-panel-open {
+	right: 0;
+}
+/* Panel right open animated */
+.ui-panel-animate.ui-panel-open.ui-panel-position-right.ui-panel-display-overlay,
+.ui-panel-animate.ui-panel-open.ui-panel-position-right.ui-panel-display-push {
+	-webkit-transform: translate3d(0,0,0);
+	transform: translate3d(0,0,0);
+	-moz-transform: none;
+}
+/* Wrapper and fixed toolbars positioning (for reveal and push) */
+/* Panel left open */
+.ui-panel-page-content-position-left {
+	left: 13em;
+	right: -13em;
+}
+/* Panel left open animated */
+.ui-panel-animate.ui-panel-page-content-position-left {
+	left: 0;
+	right: 0;
+	-webkit-transform: translate3d(13em,0,0);
+	-moz-transform: translate3d(13em,0,0);
+	transform: translate3d(13em,0,0);
+}
+/* Panel right open */
+.ui-panel-page-content-position-right {
+	left: -13em;
+	right: 13em;
+}
+/* Panel right open animated */
+.ui-panel-animate.ui-panel-page-content-position-right {
+	left: 0;
+	right: 0;
+	-webkit-transform: translate3d(-13em,0,0);
+	-moz-transform: translate3d(-13em,0,0);
+	transform: translate3d(-13em,0,0);
+}
+/* Dismiss model open */
+.ui-panel-dismiss-open.ui-panel-dismiss-position-left {
+	left: 13em;
+}
+.ui-panel-dismiss-open.ui-panel-dismiss-position-right {
+	right: 13em;
+}
+/* Shadows and borders */
+.ui-panel-display-reveal {
+	-webkit-box-shadow: inset -5px 0 5px rgba(0,0,0,.15);
+	-moz-box-shadow: inset -5px 0 5px rgba(0,0,0,.15);
+	box-shadow: inset -5px 0 5px rgba(0,0,0,.15);
+}
+.ui-panel-position-right.ui-panel-display-reveal {
+	-webkit-box-shadow: inset 5px 0 5px rgba(0,0,0,.15);
+	-moz-box-shadow: inset 5px 0 5px rgba(0,0,0,.15);
+	box-shadow: inset 5px 0 5px rgba(0,0,0,.15);
+}
+.ui-panel-display-overlay {
+	-webkit-box-shadow: 5px 0 5px rgba(0,0,0,.15);
+	-moz-box-shadow: 5px 0 5px rgba(0,0,0,.15);
+	box-shadow: 5px 0 5px rgba(0,0,0,.15);
+}
+.ui-panel-position-right.ui-panel-display-overlay {
+	-webkit-box-shadow: -5px 0 5px rgba(0,0,0,.15);
+	-moz-box-shadow: -5px 0 5px rgba(0,0,0,.15);
+	box-shadow: -5px 0 5px rgba(0,0,0,.15);
+}
+.ui-panel-open.ui-panel-position-left.ui-panel-display-push {
+	border-right-width: 1px;
+	margin-right: -1px;
+}
+.ui-panel-page-content-position-left.ui-panel-page-content-display-push {
+	margin-left: 1px;
+	width: auto;
+}
+.ui-panel-open.ui-panel-position-right.ui-panel-display-push {
+	border-left-width: 1px;
+	margin-left: -1px;
+}
+.ui-panel-page-content-position-right.ui-panel-page-content-display-push {
+	margin-right: 1px;
+	width: auto;
+}
+/* Responsive: wrap on wide viewports once open */
+@media (min-width:55em) {
+	.ui-responsive-panel .ui-panel-page-content-open.ui-panel-page-content-position-left {
+		margin-right: 13em;
+	}
+	.ui-responsive-panel .ui-panel-page-content-open.ui-panel-page-content-position-right {
+		margin-left: 13em;
+	}
+	.ui-responsive-panel .ui-panel-page-content-open {
+		width: auto;	
+	}
+	.ui-responsive-panel .ui-panel-dismiss-display-push,
+	.ui-responsive-panel.ui-page-active ~ .ui-panel-dismiss-display-push {
+		display: none;
+	}
+}
