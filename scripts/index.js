@@ -1,6 +1,7 @@
 ﻿/// <reference path="libs/underscore.js" />
 /// <reference path="libs/backbone.js" />
 /// <reference path="libs/jquery-2.1.4.js" />
+/// <reference path="libs/localforage.backbone.js" />
 /// <reference path="libs/jquery.mobile-1.4.5.js" />
 /// <reference path="libs/localforage.js" />
 // For an introduction to the Blank template, see the following documentation:
@@ -63,6 +64,13 @@
         },
     });
 
+    saya.Cart = Backbone.Model.extend({
+        initialize: function () {
+            this.config = saya.config;
+        },
+        sync: Backbone.localforage.sync('cart'),
+    });
+
     saya.CategoryCollection = Backbone.Collection.extend({
         initialize: function () {
             this.config = saya.config;
@@ -86,6 +94,14 @@
             console.log('ProductCollection: fetch remote data from "' + url + '"');
             return url;
         },
+    });
+
+    saya.CartCollection = Backbone.Collection.extend({
+        initialize: function () {
+            this.config = saya.config;
+        },
+        model: saya.Cart,
+        sync: Backbone.localforage.sync('carts'),
     });
 
     saya.CategoryListView = Backbone.View.extend({
@@ -149,7 +165,7 @@
 
     saya.ProductItemView = Backbone.View.extend({
         tagName: 'li',
-        template: _.template('<a href="#" data-product_id="<%= id %>" data-transition="slide" data-role="button"><img src="<%= logo_path %>" class="ui-li-thumb"><h2><%= name %></h2></a>'),
+        template: _.template($('#product-item-tpl').html()),
         initialize: function (options) {
             this.options = options;
             _.bindAll(this, 'render');
@@ -157,13 +173,58 @@
         },
         render: function () {
             //Pass variables in using Underscore.js Template
+            var variables = this.model.toJSON();
+
             var logo_uri = _.isArray(this.model.get('logo_uri')) ? this.model.get('logo_uri')[0] : '';
-            var variables = { id: this.model.get('id'), name: this.model.get('name'), logo_path: saya.config.serviceDomain + logo_uri };
+            variables.logo_path = saya.config.serviceDomain + logo_uri;
+
+            variables.serialize = JSON.stringify(variables);
+
             var template = this.template(variables);
 
-            // Load the compiled HTML into the Backbone "el"
             this.$el.html(template);
             return this;
+        },
+        events: {
+            "click .cart": "onClick",
+        },
+        onClick: function (event) {
+           
+            event.stopPropagation();
+            var $self = $(event.currentTarget);
+            var item = $self.data('item');
+            console.log('Prepare add item into the cart');
+            console.log(item);
+
+            var cartCollection = new saya.CartCollection();
+            cartCollection.fetch({
+                success: function (collection, response, options) {
+                    
+                    console.log('Carts was get successful.');
+                    if (!response) {
+                        console.log('Carts was empty, create first item');
+                        item.qty = 1;
+                        collection.create(item);
+                        return;
+                    }
+                    var model = collection.get(item.id);
+                    console.log(model);
+                    if (!model) {
+
+                        console.log('Carts dont have any item with id=' + item.id + ', create a new item');
+                        item.qty = 1;
+                        collection.create(item);
+                        return;
+                    }
+                    console.log('Carts had the item with id=' + item.id + ', increase item qty to ' + (model.get('qty') + 1));
+                    model.set({ qty: model.get('qty') + 1 });
+                    model.save();
+                },
+            });
+
+            cartCollection.on('update', function (collection, options) {
+
+            });
         },
     });
 
@@ -223,55 +284,6 @@
                 //$(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slide" });
             });
         });
-
-        //$("#region-page").on("pagebeforecreate", function (event, ui) {
-
-        //    localforage.getItem('region_submit', function (err, value) {
-
-        //        if (!value) {
-
-        //            $(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slideup" });
-        //        } else {
-
-
-        //        }
-        //    });
-        //});
-
-        //$("#category-page").on("pagebeforecreate", function (event) {
-
-        //    console.log('#category-page: pagebeforecreate trigger');
-        //    var categories = new saya.CategoryCollection();
-        //    var fecthCategories = categories.fetch();
-        //    var $self = $(this);
-        //    $self.find('div[role="main"]').html('');
-        //    fecthCategories.done(function (data, textStatus, jqXHR) {
-
-        //        localforage.setItem('categories', data);
-        //        var categoryListView = new saya.CategoryListView({ collection: categories });
-        //        var categoryListViewHtml = categoryListView.render();
-        //        $self.find('div[role="main"]').append(categoryListViewHtml.el);
-        //        $self.find('ul[data-role="listview"]').listview();
-        //    });
-
-        //});
-
-        //$("#product-page").on("pagebeforecreate", function (event) {
-
-        //    var products = new saya.ProductCollection();
-        //    var fecthProducts = products.fetch();
-        //    var $self = $(this);
-        //    $self.find('div[role="main"]').html('');
-        //    fecthProducts.done(function (data, textStatus, jqXHR) {
-
-        //        localforage.setItem('products', data);
-        //        var productListView = new saya.ProductListView({ collection: products });
-        //        var productListViewHtml = productListView.render();
-        //        $self.find('div[role="main"]').append(productListViewHtml.el);
-        //        $self.find('ul[data-role="listview"]').listview();
-        //    });
-
-        //});
 
         var setting = new saya.Setting();
         var fecthSetting = setting.fetch();

@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- saya references -->
     <link href="css/libs/jquery.mobile-1.4.5.css" rel="stylesheet" />
+    <link href="css/jquery.mobile.overridden.css" rel="stylesheet" />
     <link href="css/index.css" rel="stylesheet" />
 </head>
 <body>
@@ -117,16 +118,27 @@
         </div>
     </div>
 
-    <!-- /panel -->
-    <!-- Cordova reference, this is added to your app when it's built. -->
-    <script src="scripts/libs/localforage.js"></script>
-    <script src="scripts/libs/underscore.js"></script>
-    <script src="scripts/libs/jquery-2.1.4.js"></script>
-    <script src="scripts/libs/fastclick.js"></script>
-    <script src="scripts/libs/jquery.mobile-1.4.5.js"></script>
-    <script src="scripts/libs/backbone.js"></script>
-    <script src="cordova.js"></script>
-    <script src="scripts/platformOverrides.js"></script>
-    <script src="scripts/index.js"></script>
+    <script type="text/template" id="product-item-tpl">
+            <a class="ui-btn ui-btn-icon-bottom ui-icon-carat-d">
+                <img src="<%= logo_path %>" />
+                <h2><%= name %></h2>
+                <p>Giá: <%= price %>/<%= unit %></p>
+                <span class="ui-li-count ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-shop ui-btn-icon-notext ui-nodisc-icon icon-scale cart" data-item='<%= serialize %>'>Mua</span>
+                <div class="description"><%= description %></div>
+            </a>
+    </script>
+
+        <!-- /panel -->
+        <!-- Cordova reference, this is added to your app when it's built. -->
+        <script src="scripts/libs/localforage.js"></script>
+        <script src="scripts/libs/underscore.js"></script>
+        <script src="scripts/libs/jquery-2.1.4.js"></script>
+        <script src="scripts/libs/fastclick.js"></script>
+        <script src="scripts/libs/jquery.mobile-1.4.5.js"></script>
+        <script src="scripts/libs/backbone.js"></script>
+        <script src="scripts/libs/localforage.backbone.js"></script>
+        <script src="cordova.js"></script>
+        <script src="scripts/platformOverrides.js"></script>
+        <script src="scripts/index.js"></script>
 </body>
 </html>
