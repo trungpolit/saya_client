@@ -136,6 +136,22 @@
         },
     });
 
+    saya.CartListView = Backbone.View.extend({
+        el: '<ul data-role="listview" data-inset="true" />',
+        render: function () {
+            var models = this.collection.models;
+            var self = this;
+            var list = '';
+            _.each(models, function (model, index) {
+
+                var cartItem = new saya.CartItemView({ model: model});
+                self.$el.append(cartItem.el);
+            });
+
+            return this;
+        },
+    });
+
     saya.CategoryItemView = Backbone.View.extend({
         tagName: 'li',
         template: _.template('<a href="#product-page" data-category_id="<%= id %>" data-transition="slide"><img src="<%= logo_path %>" class="ui-li-thumb"><h2><%= name %></h2></a>'),
@@ -168,11 +184,11 @@
         template: _.template($('#product-item-tpl').html()),
         initialize: function (options) {
             this.options = options;
-            _.bindAll(this, 'render');
+            _.bindAll(this, 'render', 'onCartCreateSuccess', 'onCartCreateError', 'changeCartPage');
             this.render();
         },
         render: function () {
-            //Pass variables in using Underscore.js Template
+           
             var variables = this.model.toJSON();
 
             var logo_uri = _.isArray(this.model.get('logo_uri')) ? this.model.get('logo_uri')[0] : '';
@@ -193,10 +209,10 @@
             event.stopPropagation();
             var $self = $(event.currentTarget);
             var item = $self.data('item');
+            var thisView = this;
             console.log('Prepare add item into the cart');
             console.log(item);
 
-            var cartCollection = new saya.CartCollection();
             cartCollection.fetch({
                 success: function (collection, response, options) {
                     
@@ -204,7 +220,10 @@
                     if (!response) {
                         console.log('Carts was empty, create first item');
                         item.qty = 1;
-                        collection.create(item);
+                        collection.create(item, {
+                            success: thisView.onCartCreateSuccess,
+                            error: thisView.onCartCreateError,
+                        });
                         return;
                     }
                     var model = collection.get(item.id);
@@ -217,14 +236,57 @@
                         return;
                     }
                     console.log('Carts had the item with id=' + item.id + ', increase item qty to ' + (model.get('qty') + 1));
-                    model.set({ qty: model.get('qty') + 1 });
-                    model.save();
+                    model.save({ qty: model.get('qty') + 1 }, {
+                        success: thisView.onCartCreateSuccess,
+                        error: thisView.onCartCreateError,
+                    });
                 },
             });
+        },
+        changeCartPage: function (collection) {
 
-            cartCollection.on('update', function (collection, options) {
+            var cartListView = new saya.CartListView({ collection: collection });
+            var cartListViewHtml = cartListView.render();
+            var $cartPage = $('#cart-page').find('div[role="main"]');
 
-            });
+            $cartPage.html('');
+            $cartPage.append(cartListViewHtml.el);
+            $cartPage.find('input[type="range"]').slider();
+            $cartPage.find('ul[data-role="listview"]').listview();
+
+            console.log('#cart-page was rendered, change to #cart-page');
+            $(":mobile-pagecontainer").pagecontainer("change", "#cart-page", { transition: "slide" });
+        },
+        onCartCreateSuccess: function () {
+            
+            console.log('Carts was updated, re-render #cart-page');
+            this.changeCartPage(cartCollection);
+        },
+        onCartCreateError: function () {
+
+            console.log('Carts was not updated.');
+        },
+    });
+
+    saya.CartItemView = Backbone.View.extend({
+        tagName: 'li',
+        template: _.template($('#cart-item-tpl').html()),
+        initialize: function () {
+            this.render();
+        },
+        render: function () {
+
+            var variables = this.model.toJSON();
+
+            var logo_uri = _.isArray(this.model.get('logo_uri')) ? this.model.get('logo_uri')[0] : '';
+            variables.logo_path = saya.config.serviceDomain + logo_uri;
+
+            variables.serialize = JSON.stringify(variables);
+
+            var template = this.template(variables);
+
+            this.$el.html(template);
+            return this;
         },
     });
 
@@ -239,6 +301,9 @@
 
         return output;
     };
+
+    // khởi tạo luôn cartCollection toàn cục, dùng chung cho cả ứng dụng
+    var cartCollection = new saya.CartCollection();
 
     document.addEventListener('deviceready', onDeviceReady.bind(this), false);
 

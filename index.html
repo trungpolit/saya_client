@@ -83,28 +83,16 @@
 
     <div data-role="page" id="product-page" data-theme="b">
         <div data-role="header" data-position="fixed">
-            <h1>Saya</h1>
-            <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l">Back</a>
-            <a href="#product-panel" data-icon="bars" data-iconpos="notext">Menu</a>
+            <h1>
+                <span class="page-title">
+                    <span class="s">S</span><span class="a-first">a</span><span class="y">y</span><span class="a-last">a</span>
+                </span>
+            </h1>
+            <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-scale">Back</a>
+            <a href="#product-panel" data-icon="bars" data-iconpos="notext" class="icon-scale">Menu</a>
         </div><!-- /header -->
 
         <div role="main" class="ui-content">
-            <div data-role="collapsible" data-collapsed="false">
-                <h4>Heading</h4>
-                <ul data-role="listview">
-                    <li><a href="#">List item 1</a></li>
-                    <li><a href="#">List item 2</a></li>
-                    <li><a href="#">List item 3</a></li>
-                </ul>
-            </div>
-            <div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right">
-                <h4></h4>
-                <ul data-role="listview" data-inset="false">
-                    <li>Read-only list item 1</li>
-                    <li>Read-only list item 2</li>
-                    <li>Read-only list item 3</li>
-                </ul>
-            </div>
         </div><!-- /content -->
 
         <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="product-panel" data-position="right">
@@ -118,14 +106,56 @@
         </div>
     </div>
 
+    <div data-role="page" id="cart-page" data-theme="b">
+        <div data-role="header" data-position="fixed">
+            <h1>
+                <span class="page-title">
+                    <span class="s">S</span><span class="a-first">a</span><span class="y">y</span><span class="a-last">a</span>
+                </span>
+            </h1>
+            <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-scale">Back</a>
+            <a href="#cart-panel" data-icon="bars" data-iconpos="notext" class="icon-scale">Menu</a>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+        </div><!-- /content -->
+
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="cart-panel" data-position="right">
+            <ul data-role="listview">
+                <li data-icon="delete"><a href="#" data-rel="close">Đóng</a></li>
+                <li><a href="#panel-fixed-page2">Địa chỉ</a></li>
+                <li><a href="#panel-fixed-page2">Liên kết</a></li>
+                <li><a href="#panel-fixed-page2">Giới thiệu</a></li>
+                <li><a href="#panel-fixed-page2">Thoát</a></li>
+            </ul>
+        </div>
+    </div>
+
     <script type="text/template" id="product-item-tpl">
             <a class="ui-btn ui-btn-icon-bottom ui-icon-carat-d">
-                <img src="<%= logo_path %>" />
+                <img src="<%= logo_path %>" alt="<%= name %>"/>
                 <h2><%= name %></h2>
                 <p>Giá: <%= price %>/<%= unit %></p>
                 <span class="ui-li-count ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-shop ui-btn-icon-notext ui-nodisc-icon icon-scale cart" data-item='<%= serialize %>'>Mua</span>
                 <div class="description"><%= description %></div>
             </a>
+    </script>
+
+    <script type="text/template" id="cart-item-tpl">
+        <div class="ui-grid-a">
+            <div class="ui-block-a">
+                <a href="#product-page">
+                    <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo"/>
+                    <br />
+                    <small><%= name %></small>
+                    <br />
+                    <small><%= price %>/<%= unit %></small>
+                </a>
+            </div>
+            <div class="ui-block-b">
+                <input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="3" value="<%= qty %>">
+            </div>
+        </div> 
     </script>
 
         <!-- /panel -->
