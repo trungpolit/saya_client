@@ -213,7 +213,7 @@
             console.log('Prepare add item into the cart');
             console.log(item);
 
-            cartCollection.fetch({
+            saya.cart.fetch({
                 success: function (collection, response, options) {
                     
                     console.log('Carts was get successful.');
@@ -232,7 +232,10 @@
 
                         console.log('Carts dont have any item with id=' + item.id + ', create a new item');
                         item.qty = 1;
-                        collection.create(item);
+                        collection.create(item, {
+                            success: thisView.onCartCreateSuccess,
+                            error: thisView.onCartCreateError,
+                        });
                         return;
                     }
                     console.log('Carts had the item with id=' + item.id + ', increase item qty to ' + (model.get('qty') + 1));
@@ -245,22 +248,13 @@
         },
         changeCartPage: function (collection) {
 
-            var cartListView = new saya.CartListView({ collection: collection });
-            var cartListViewHtml = cartListView.render();
-            var $cartPage = $('#cart-page').find('div[role="main"]');
-
-            $cartPage.html('');
-            $cartPage.append(cartListViewHtml.el);
-            $cartPage.find('input[type="range"]').slider();
-            $cartPage.find('ul[data-role="listview"]').listview();
-
             console.log('#cart-page was rendered, change to #cart-page');
             $(":mobile-pagecontainer").pagecontainer("change", "#cart-page", { transition: "slide" });
         },
         onCartCreateSuccess: function () {
             
             console.log('Carts was updated, re-render #cart-page');
-            this.changeCartPage(cartCollection);
+            this.changeCartPage();
         },
         onCartCreateError: function () {
 
@@ -303,7 +297,7 @@
     };
 
     // khởi tạo luôn cartCollection toàn cục, dùng chung cho cả ứng dụng
-    var cartCollection = new saya.CartCollection();
+   saya.cart = new saya.CartCollection();
 
     document.addEventListener('deviceready', onDeviceReady.bind(this), false);
 
@@ -423,6 +417,16 @@
                     $toPage.find('ul[data-role="listview"]').listview();
                     $.mobile.loading("hide");
                 });
+            } else if (page_id == 'cart-page') {
+
+                var cartListView = new saya.CartListView({ collection: saya.cart });
+                var cartListViewHtml = cartListView.render();
+                var $cartPage = $toPage.find('div[role="main"]');
+
+                $cartPage.html('');
+                $cartPage.append(cartListViewHtml.el);
+
+                $toPage.trigger('create');
             }
         });
     };

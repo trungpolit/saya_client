@@ -144,7 +144,7 @@
     <script type="text/template" id="cart-item-tpl">
         <div class="ui-grid-a">
             <div class="ui-block-a">
-                <a href="#product-page">
+                <a href="#product-page" class="cart-item">
                     <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo"/>
                     <br />
                     <small><%= name %></small>
@@ -153,13 +153,11 @@
                 </a>
             </div>
             <div class="ui-block-b">
-                <input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="3" value="<%= qty %>">
+                <input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="100" value="<%= qty %>" data-highlight="true" />
             </div>
         </div> 
     </script>
 
-        <!-- /panel -->
-        <!-- Cordova reference, this is added to your app when it's built. -->
         <script src="scripts/libs/localforage.js"></script>
         <script src="scripts/libs/underscore.js"></script>
         <script src="scripts/libs/jquery-2.1.4.js"></script>
