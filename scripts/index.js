@@ -31,6 +31,19 @@
     saya.region_id = '';
     saya.category_id = '';
     saya.customer_id = '';
+    saya.caculateCartTotalPrice = function (cart) {
+
+        var total_price = 0;
+        _.each(cart, function (item, index) {
+
+            total_price += item.qty * item.price;
+        });
+        return total_price;
+    };
+    saya.displayCartTotalPrice = function (total_price) {
+
+        $('#cart-total-price').html(this.utli.numberFormat(total_price));
+    };
 
     saya.Setting = Backbone.Model.extend({
         initialize: function () {
@@ -195,6 +208,8 @@
             variables.logo_path = saya.config.serviceDomain + logo_uri;
 
             variables.serialize = JSON.stringify(variables);
+            console.log(variables);
+            variables.price = saya.utli.numberFormat(parseFloat(variables.price));
 
             var template = this.template(variables);
 
@@ -202,9 +217,27 @@
             return this;
         },
         events: {
-            "click .cart": "onClick",
+            "click .cart": "onCartButtonClick",
+            "click .product-item": "onProductItemClick",
         },
-        onClick: function (event) {
+        onProductItemClick: function(event){
+
+            var $self = $(event.currentTarget);
+            var $description = $self.find('.description');
+            if ($self.hasClass('ui-icon-carat-d')) {
+
+                $self.removeClass('ui-icon-carat-d');
+                $self.addClass('ui-icon-carat-u');
+                $description.css({ 'white-space': 'normal' });
+                $description.show();
+            } else {
+
+                $self.removeClass('ui-icon-carat-u');
+                $self.addClass('ui-icon-carat-d');
+                $description.hide();
+            }
+        },
+        onCartButtonClick: function (event) {
            
             event.stopPropagation();
             var $self = $(event.currentTarget);
@@ -246,7 +279,7 @@
                 },
             });
         },
-        changeCartPage: function (collection) {
+        changeCartPage: function () {
 
             console.log('#cart-page was rendered, change to #cart-page');
             $(":mobile-pagecontainer").pagecontainer("change", "#cart-page", { transition: "slide" });
@@ -254,6 +287,8 @@
         onCartCreateSuccess: function () {
             
             console.log('Carts was updated, re-render #cart-page');
+            var total_price = saya.caculateCartTotalPrice(saya.cart.toJSON());
+            saya.displayCartTotalPrice(total_price);
             this.changeCartPage();
         },
         onCartCreateError: function () {
@@ -276,11 +311,18 @@
             variables.logo_path = saya.config.serviceDomain + logo_uri;
 
             variables.serialize = JSON.stringify(variables);
+            variables.price = saya.utli.numberFormat(parseFloat(variables.price));
 
             var template = this.template(variables);
 
             this.$el.html(template);
             return this;
+        },
+        events: {
+            "change .qty": "onChange",
+        },
+        onChange: function (event) {
+
         },
     });
 
@@ -294,6 +336,20 @@
         });
 
         return output;
+    };
+    saya.utli = {};
+    saya.utli.numberFormat = function (number, dec, dsep, tsep) {
+
+        if (isNaN(number) || number == null) return '';
+
+        number = number.toFixed(~~dec);
+        tsep = typeof tsep == 'string' ? tsep : ',';
+
+        var parts = number.split('.'),
+          fnums = parts[0],
+          decimals = parts[1] ? (dsep || '.') + parts[1] : '';
+
+        return fnums.replace(/(\d)(?=(?:\d{3})+$)/g, '$1' + tsep) + decimals;
     };
 
     // khởi tạo luôn cartCollection toàn cục, dùng chung cho cả ứng dụng

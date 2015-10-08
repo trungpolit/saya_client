@@ -120,6 +120,11 @@
         <div role="main" class="ui-content">
         </div><!-- /content -->
 
+        <div data-role="footer" data-position="fixed">
+            <h1 style="text-align: left">Tổng tiền: <span id="cart-total-price"></span>đ</h1>
+            <a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button-right ui-btn-icon-right ui-icon-carat-r">Tiếp theo</a>
+        </div>
+
         <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="cart-panel" data-position="right">
             <ul data-role="listview">
                 <li data-icon="delete"><a href="#" data-rel="close">Đóng</a></li>
@@ -132,7 +137,7 @@
     </div>
 
     <script type="text/template" id="product-item-tpl">
-            <a class="ui-btn ui-btn-icon-bottom ui-icon-carat-d">
+            <a class="ui-btn ui-btn-icon-bottom ui-icon-carat-d product-item">
                 <img src="<%= logo_path %>" alt="<%= name %>"/>
                 <h2><%= name %></h2>
                 <p>Giá: <%= price %>/<%= unit %></p>
@@ -153,7 +158,7 @@
                 </a>
             </div>
             <div class="ui-block-b">
-                <input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="100" value="<%= qty %>" data-highlight="true" />
+                <input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="100" value="<%= qty %>" data-highlight="true" class="qty" />
             </div>
         </div> 
     </script>
