@@ -362,7 +362,7 @@
         document.addEventListener( 'pause', onPause.bind( this ), false );
         document.addEventListener('resume', onResume.bind(this), false);
 
-        FastClick.attach(document.body);
+        // FastClick.attach(document.body);
 
         $('#region_parent').on('change', function () {
 
