@@ -31,6 +31,8 @@
     saya.region_id = '';
     saya.category_id = '';
     saya.customer_id = '';
+    saya.product_expand = '';
+    saya.cart_item_remove = {};
     saya.caculateCartTotalPrice = function (cart) {
 
         var total_price = 0;
@@ -147,6 +149,30 @@
 
             return this;
         },
+        expand: function () {
+
+            if (!saya.product_expand.length) {
+
+                return;
+            }
+
+            console.log('Product with id=' + saya.product_expand+' need to expand');
+            var $product_expand = $(saya.product_expand);
+            console.log($product_expand);
+            saya.product_expand = '';
+
+            // thực hiện scroll tới vị trí product đã được expand
+            var offset = $product_expand.offset();
+            console.log('Product needed to expand has offset:');
+            console.log(offset);
+
+            console.log('Scroll to expanded product');
+            $('html, body').animate({
+                scrollTop: offset.top
+            }, 2000);
+
+            $product_expand.trigger('click');
+        },
     });
 
     saya.CartListView = Backbone.View.extend({
@@ -202,14 +228,20 @@
         },
         render: function () {
            
+            console.log('Render product item');
             var variables = this.model.toJSON();
+
+            // thiết lập id cho li
+            this.$el.attr('id', 'product-' + variables.id);
 
             var logo_uri = _.isArray(this.model.get('logo_uri')) ? this.model.get('logo_uri')[0] : '';
             variables.logo_path = saya.config.serviceDomain + logo_uri;
 
             variables.serialize = JSON.stringify(variables);
-            console.log(variables);
             variables.price = saya.utli.numberFormat(parseFloat(variables.price));
+
+            console.log('Product item detail:');
+            console.log(variables);
 
             var template = this.template(variables);
 
@@ -218,17 +250,17 @@
         },
         events: {
             "click .cart": "onCartButtonClick",
-            "click .product-item": "onProductItemClick",
+            "click": "onProductItemClick",
         },
         onProductItemClick: function(event){
 
-            var $self = $(event.currentTarget);
+            console.log('Tap on product item was trigger');
+            var $self = this.$('a.product-item');
             var $description = $self.find('.description');
             if ($self.hasClass('ui-icon-carat-d')) {
 
                 $self.removeClass('ui-icon-carat-d');
                 $self.addClass('ui-icon-carat-u');
-                $description.css({ 'white-space': 'normal' });
                 $description.show();
             } else {
 
@@ -239,6 +271,7 @@
         },
         onCartButtonClick: function (event) {
            
+            console.log('Tap on cart button was trigger');
             event.stopPropagation();
             var $self = $(event.currentTarget);
             var item = $self.data('item');
@@ -305,13 +338,20 @@
         },
         render: function () {
 
+            console.log('Render cart item');
             var variables = this.model.toJSON();
+
+            // thiết lập id cho li
+            this.$el.attr('id', 'cart-item-' + variables.id);
 
             var logo_uri = _.isArray(this.model.get('logo_uri')) ? this.model.get('logo_uri')[0] : '';
             variables.logo_path = saya.config.serviceDomain + logo_uri;
 
             variables.serialize = JSON.stringify(variables);
             variables.price = saya.utli.numberFormat(parseFloat(variables.price));
+
+            console.log('Cart item detail:');
+            console.log(variables);
 
             var template = this.template(variables);
 
@@ -320,9 +360,33 @@
         },
         events: {
             "change .qty": "onChange",
+            "click .cart-item": "onClick",
         },
         onChange: function (event) {
 
+            console.log('Change product item qty was trigger');
+            var $self = $(event.currentTarget);
+            var item = $self.data('item');
+            var product = saya.cart.get(item.id);
+            if (!product) {
+
+                console.log('Product item with id=' + item.id + ' doesnt exist in cart');
+                return;
+            }
+
+            var new_qty = $self.val();
+            var old_qty = product.get('qty');
+
+            if (new_qty == 0) {
+
+                saya.cart_item_remove = item;
+                $("#cart-confirm-remove").popup("open", {});
+            }
+        },
+        onClick: function (event) {
+
+            var $self = $(event.currentTarget);
+            saya.product_expand = $self.data('expand');
         },
     });
 
@@ -381,7 +445,7 @@
             });
         });
 
-        $('#region_submit').on('click', function () {
+        $('#region_submit').on("click", function () {
 
             var parent = $('#region_parent').val();
             var child = $('#region_child').val();
@@ -400,6 +464,32 @@
             });
         });
 
+        // xử lý khi xóa item trong giỏ hàng
+        $("#cart-confirm-ok").on('click', function () {
+
+            if (_.isEmpty(saya.cart_item_remove)) {
+
+                console.log('Cart item needed to remove was empty.');
+                return;
+            }
+
+            var $cart_item = $('#' + 'cart-item-' + saya.cart_item_remove.id);
+            $cart_item.remove();
+            saya.cart.get(saya.cart_item_remove.id).destroy();
+            saya.cart_item_remove = {};
+
+            var total_price = saya.caculateCartTotalPrice(saya.cart.toJSON());
+            saya.displayCartTotalPrice(total_price);
+
+            // kiểm tra nếu giỏ hàng đã bị xóa hết thì điều hướng về màn hình #category-page
+            if (!$('#cart-list').find('li[id^="cart-item-"]').length) {
+
+                $(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slide" });
+            }
+
+        });
+
+        $.mobile.loading('show', {});
         var setting = new saya.Setting();
         var fecthSetting = setting.fetch();
         fecthSetting.done(function (data, textStatus, jqXHR) {
@@ -409,11 +499,13 @@
             $('#region_parent').html(saya.helper.renderOpts(region_parent));
             $('#region_parent').selectmenu("refresh");
             $('#region_parent').trigger('change');
+            $.mobile.loading("hide");
         });
 
         fecthSetting.fail(function (jqXHR, textStatus, errorThrown) {
 
             alert(errorThrown);
+            $.mobile.loading("hide");
         });
 
         $(document).on("pagecontainerbeforeshow", function (event, ui) {
@@ -444,7 +536,7 @@
             }else if (page_id == 'category-page') {
 
                 console.log('category-page: fetch and render remote data');
-                $.mobile.loading("show");
+                $.mobile.loading('show', {});
                 var categories = new saya.CategoryCollection();
                 var fecthCategories = categories.fetch();
                 $toPage.find('div[role="main"]').html('');
@@ -460,7 +552,7 @@
             } else if (page_id == 'product-page') {
 
                 console.log('product-page: fetch and render remote data');
-                $.mobile.loading("show");
+                $.mobile.loading('show', {});
                 var products = new saya.ProductCollection();
                 var fecthProducts = products.fetch();
                 $toPage.find('div[role="main"]').html('');
@@ -471,13 +563,14 @@
                     var productListViewHtml = productListView.render();
                     $toPage.find('div[role="main"]').append(productListViewHtml.el);
                     $toPage.find('ul[data-role="listview"]').listview();
+                    productListView.expand();
                     $.mobile.loading("hide");
                 });
             } else if (page_id == 'cart-page') {
 
                 var cartListView = new saya.CartListView({ collection: saya.cart });
                 var cartListViewHtml = cartListView.render();
-                var $cartPage = $toPage.find('div[role="main"]');
+                var $cartPage = $toPage.find('#cart-list');
 
                 $cartPage.html('');
                 $cartPage.append(cartListViewHtml.el);

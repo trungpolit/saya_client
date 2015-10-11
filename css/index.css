@@ -83,7 +83,7 @@ input {
 .icon-scale {
     height: 3.6em !important;
     width: 3.6em !important;
-    border-radius: 3.6em !important;
+    border-radius: 50% !important;
 }
 
     .icon-scale:after {
@@ -107,6 +107,14 @@ input {
 
 #product-page .description {
     display: none;
+    white-space: normal;
+    font-size: 0.75em;
+    font-weight: normal;
+}
+
+#product-page .description p {
+    white-space: normal !important;
+    font-size: 1em;
 }
 
 .product-logo {
@@ -123,6 +131,18 @@ a.cart-item {
         color: white;
     }
 
+.add-button {
+    position: fixed;
+    right: 1em;
+    bottom: 3em;
+    background-color: #F44336 !important;
+    z-index:99;
+}
+
+.ui-slider-handle {
+    border-radius:50%;
+}
+
 .footer-button-left,
 .footer-button-right {
     position: absolute;
@@ -138,4 +158,8 @@ a.cart-item {
 .footer-button-right {
     right: 0.4em;
     top: 0.1em;
+}
+
+.inline-block {
+    display:inline-block;
 }

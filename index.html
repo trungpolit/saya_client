@@ -9,7 +9,7 @@
     -->
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'">
     <title>saya</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
     <!-- saya references -->
     <link href="css/libs/jquery.mobile-1.4.5.css" rel="stylesheet" />
     <link href="css/jquery.mobile.overridden.css" rel="stylesheet" />
@@ -118,6 +118,10 @@
         </div><!-- /header -->
 
         <div role="main" class="ui-content">
+            <div id="cart-list">
+
+            </div>
+            <a href="#category-page" data-transition="slide" class="ui-btn ui-shadow ui-corner-all ui-icon-plus icon-scale ui-btn-icon-notext add-button"></a>
         </div><!-- /content -->
 
         <div data-role="footer" data-position="fixed">
@@ -134,22 +138,43 @@
                 <li><a href="#panel-fixed-page2">Thoát</a></li>
             </ul>
         </div>
+
+        <div data-role="popup" id="cart-confirm-remove" data-overlay-theme="b" data-theme="b">
+            <div data-role="header" data-theme="a">
+                <h1>Cảnh báo</h1>
+            </div>
+            <div role="main" class="ui-content">
+                <p>Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?</p>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-ok">Đồng ý</a>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-cancel">Hủy bỏ</a>
+            </div>
+        </div>
     </div>
 
     <script type="text/template" id="product-item-tpl">
             <a class="ui-btn ui-btn-icon-bottom ui-icon-carat-d product-item">
-                <img src="<%= logo_path %>" alt="<%= name %>"/>
-                <h2><%= name %></h2>
-                <p>Giá: <%= price %>/<%= unit %></p>
-                <span class="ui-li-count ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-shop ui-btn-icon-notext ui-nodisc-icon icon-scale cart" data-item='<%= serialize %>'>Mua</span>
-                <div class="description"><%= description %></div>
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo inline-block" />
+                        <div class="inline-block">
+                            <h2><%= name %></h2>
+                            <p>Giá: <%= price %>/<%= unit %></p>
+                        </div>
+                    </div>
+                    <div class="ui-block-b">
+                        <span class="ui-btn ui-btn-right ui-shadow ui-corner-all ui-icon-shop ui-btn-icon-notext ui-nodisc-icon cart icon-scale" data-item='<%= serialize %>'>Mua</span>
+                    </div>
+                </div>
+                <div class="ui-grid-solo">
+                    <div class="description"><%= description %></div>
+                </div>
             </a>
     </script>
 
     <script type="text/template" id="cart-item-tpl">
         <div class="ui-grid-a">
             <div class="ui-block-a">
-                <a href="#product-page" class="cart-item">
+                <a href="#product-page" class="cart-item" data-transition="slide" data-expand="#product-<%= id %>">
                     <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo"/>
                     <br />
                     <small><%= name %></small>
@@ -158,7 +183,7 @@
                 </a>
             </div>
             <div class="ui-block-b">
-                <input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="100" value="<%= qty %>" data-highlight="true" class="qty" />
+                <input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="100" value="<%= qty %>" data-highlight="true" class="qty" data-item='<%= serialize %>' />
             </div>
         </div> 
     </script>
