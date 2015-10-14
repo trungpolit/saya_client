@@ -1,6 +1,7 @@
 ﻿/// <reference path="libs/underscore.js" />
 /// <reference path="libs/backbone.js" />
 /// <reference path="libs/jquery-2.1.4.js" />
+/// <reference path="libs/jquery.spin.js" />
 /// <reference path="libs/localforage.backbone.js" />
 /// <reference path="libs/jquery.mobile-1.4.5.js" />
 /// <reference path="libs/localforage.js" />
@@ -29,8 +30,11 @@
     };
     saya.region_parent_id = '';
     saya.region_id = '';
+    saya.region_parent_name = '';
+    saya.region_name = '';
     saya.category_id = '';
     saya.customer_id = '';
+    saya.customer_info = {};
     saya.product_expand = '';
     saya.cart_item_remove = {};
     saya.caculateCartTotalPrice = function (cart) {
@@ -45,6 +49,19 @@
     saya.displayCartTotalPrice = function (total_price) {
 
         $('#cart-total-price').html(this.utli.numberFormat(total_price));
+    };
+    saya.setCustomerId = function () {
+
+        localforage.getItem('customer_id', function (err, value) {
+
+            if (!value) {
+
+                value = device.uuid | saya.utli.guid();
+                localforage.setItem('customer_id', value);
+            }
+
+            saya.customer_id = value;
+        });
     };
 
     saya.Setting = Backbone.Model.extend({
@@ -415,6 +432,14 @@
 
         return fnums.replace(/(\d)(?=(?:\d{3})+$)/g, '$1' + tsep) + decimals;
     };
+    saya.utli.guid = function () {
+
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+        return uuid;
+    };
 
     // khởi tạo luôn cartCollection toàn cục, dùng chung cho cả ứng dụng
    saya.cart = new saya.CartCollection();
@@ -425,6 +450,8 @@
         // Handle the Cordova pause and resume events
         document.addEventListener( 'pause', onPause.bind( this ), false );
         document.addEventListener('resume', onResume.bind(this), false);
+
+        saya.setCustomerId();
 
         // FastClick.attach(document.body);
 
@@ -439,7 +466,10 @@
                 } else {
 
                     var region_child = regions.child[parent];
-                    $('#region_child').html(saya.helper.renderOpts(region_child));
+                    var opts = '<option value="">Quận/Huyện/Thị xã</option>';
+                    opts += saya.helper.renderOpts(region_child);
+
+                    $('#region_child').html(opts);
                     $('#region_child').selectmenu("refresh");
                 }
             });
@@ -450,8 +480,14 @@
             var parent = $('#region_parent').val();
             var child = $('#region_child').val();
 
+            var parent_name = $('#region_parent').find('option:selected').text();
+            var child_name = $('#region_child').find('option:selected').text();
+
             saya.region_parent_id = parent;
             saya.region_id = child;
+
+            saya.region_parent_name = parent_name;
+            saya.region_name = child_name;
 
             if (!parent.length || !child.length) {
 
@@ -485,21 +521,35 @@
             if (!$('#cart-list').find('li[id^="cart-item-"]').length) {
 
                 $(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slide" });
+                return false;
             }
 
         });
 
-        $.mobile.loading('show', {});
+        $('#checkout').on('click', function () {
+
+            var customer = {
+                fullname: $('#fullname').val(),
+                mobile: $('#mobile').val(),
+                mobile2: $('#mobile2').val(),
+                address: $('#address').val(),
+            };
+            localforage.setItem('customer_info', customer);
+        });
+
+        $('body').spin();
         var setting = new saya.Setting();
         var fecthSetting = setting.fetch();
         fecthSetting.done(function (data, textStatus, jqXHR) {
 
             localforage.setItem('regions', data);
             var region_parent = data.parent;
-            $('#region_parent').html(saya.helper.renderOpts(region_parent));
+            var opts = '<option value="">Tỉnh/thành phố</option>';
+            opts += saya.helper.renderOpts(region_parent);
+            $('#region_parent').html(opts);
             $('#region_parent').selectmenu("refresh");
             $('#region_parent').trigger('change');
-            $.mobile.loading("hide");
+            $('body').spin(false);
         });
 
         fecthSetting.fail(function (jqXHR, textStatus, errorThrown) {
@@ -536,7 +586,7 @@
             }else if (page_id == 'category-page') {
 
                 console.log('category-page: fetch and render remote data');
-                $.mobile.loading('show', {});
+                $('body').spin();
                 var categories = new saya.CategoryCollection();
                 var fecthCategories = categories.fetch();
                 $toPage.find('div[role="main"]').html('');
@@ -547,12 +597,12 @@
                     var categoryListViewHtml = categoryListView.render();
                     $toPage.find('div[role="main"]').append(categoryListViewHtml.el);
                     $toPage.find('ul[data-role="listview"]').listview();
-                    $.mobile.loading("hide");
+                    $('body').spin(false);
                 });
             } else if (page_id == 'product-page') {
 
                 console.log('product-page: fetch and render remote data');
-                $.mobile.loading('show', {});
+                $('body').spin();
                 var products = new saya.ProductCollection();
                 var fecthProducts = products.fetch();
                 $toPage.find('div[role="main"]').html('');
@@ -564,10 +614,11 @@
                     $toPage.find('div[role="main"]').append(productListViewHtml.el);
                     $toPage.find('ul[data-role="listview"]').listview();
                     productListView.expand();
-                    $.mobile.loading("hide");
+                    $('body').spin(false);
                 });
             } else if (page_id == 'cart-page') {
 
+                console.log('cart-page: render data');
                 var cartListView = new saya.CartListView({ collection: saya.cart });
                 var cartListViewHtml = cartListView.render();
                 var $cartPage = $toPage.find('#cart-list');
@@ -576,6 +627,24 @@
                 $cartPage.append(cartListViewHtml.el);
 
                 $toPage.trigger('create');
+            } else if (page_id == 'customer-page') {
+
+                console.log('customer-page: render data');
+                $toPage.find('.region_parent').text(saya.region_parent_name);
+                $toPage.find('.region').text(saya.region_name);
+
+                localforage.getItem('customer_info', function (err, value) {
+
+                    if (!value) {
+
+                        return;
+                    }
+
+                    $('#fullname').val(value.fullname);
+                    $('#mobile').val(value.mobile);
+                    $('#mobile2').val(value.mobile2);
+                    $('#address').val(value.address);
+                });
             }
         });
     };

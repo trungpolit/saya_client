@@ -126,10 +126,110 @@
 
         <div data-role="footer" data-position="fixed">
             <h1 style="text-align: left">Tổng tiền: <span id="cart-total-price"></span>đ</h1>
-            <a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button-right ui-btn-icon-right ui-icon-carat-r">Tiếp theo</a>
+            <a href="#customer-page" data-transition="slide" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button-right ui-btn-icon-right ui-icon-carat-r">Tiếp theo</a>
         </div>
 
         <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="cart-panel" data-position="right">
+            <ul data-role="listview">
+                <li data-icon="delete"><a href="#" data-rel="close">Đóng</a></li>
+                <li><a href="#panel-fixed-page2">Địa chỉ</a></li>
+                <li><a href="#panel-fixed-page2">Liên kết</a></li>
+                <li><a href="#panel-fixed-page2">Giới thiệu</a></li>
+                <li><a href="#panel-fixed-page2">Thoát</a></li>
+            </ul>
+        </div>
+
+        <div data-role="popup" id="cart-confirm-remove" data-overlay-theme="b" data-theme="b">
+            <div data-role="header" data-theme="a">
+                <h1>Cảnh báo</h1>
+            </div>
+            <div role="main" class="ui-content">
+                <p>Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?</p>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-ok">Đồng ý</a>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-cancel">Hủy bỏ</a>
+            </div>
+        </div>
+    </div>
+
+    <div data-role="page" id="customer-page" data-theme="b">
+        <div data-role="header" data-position="fixed">
+            <h1>
+                <span class="page-title">
+                    <span class="s">S</span><span class="a-first">a</span><span class="y">y</span><span class="a-last">a</span>
+                </span>
+            </h1>
+            <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-scale icon-header ui-nodisc-icon">Back</a>
+            <a href="#customer-panel" data-icon="bars" data-iconpos="notext" class="icon-scale icon-header ui-nodisc-icon">Menu</a>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+            <label for="fullname">Họ và tên:</label>
+            <input type="text" name="fullname" id="fullname" value="" required>
+            <label for="mobile">Số điện thoại chính:</label>
+            <input type="number" name="mobile" pattern="[0-9]*" id="mobile" value="" required>
+            <label for="mobile2">Số điện thoại dự phòng:</label>
+            <input type="number" name="mobile2" pattern="[0-9]*" id="mobile2" value="">
+            <label for="address">Địa chỉ giao hàng:</label>
+            <textarea cols="40" rows="8" name="address" id="address" required></textarea>
+            <label>Tỉnh/Thành phố của bạn:</label>
+            <p class="region_parent"></p>
+            <label>Quận/Huyện/Thị xã của bạn:</label>
+            <p class="region"></p>
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed">
+            <h1></h1>
+            <a id="checkout" href="#checkout-page" data-transition="slide" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button-right ui-btn-icon-right ui-icon-carat-r">Tiếp theo</a>
+        </div>
+
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="customer-panel" data-position="right">
+            <ul data-role="listview">
+                <li data-icon="delete"><a href="#" data-rel="close">Đóng</a></li>
+                <li><a href="#panel-fixed-page2">Địa chỉ</a></li>
+                <li><a href="#panel-fixed-page2">Liên kết</a></li>
+                <li><a href="#panel-fixed-page2">Giới thiệu</a></li>
+                <li><a href="#panel-fixed-page2">Thoát</a></li>
+            </ul>
+        </div>
+
+        <div data-role="popup" id="cart-confirm-remove" data-overlay-theme="b" data-theme="b">
+            <div data-role="header" data-theme="a">
+                <h1>Cảnh báo</h1>
+            </div>
+            <div role="main" class="ui-content">
+                <p>Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?</p>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-ok">Đồng ý</a>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-cancel">Hủy bỏ</a>
+            </div>
+        </div>
+    </div>
+
+    <div data-role="page" id="checkout-page" data-theme="b">
+        <div data-role="header" data-position="fixed">
+            <h1>
+                <span class="page-title">
+                    <span class="s">S</span><span class="a-first">a</span><span class="y">y</span><span class="a-last">a</span>
+                </span>
+            </h1>
+            <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-scale icon-header ui-nodisc-icon">Back</a>
+            <a href="#checkout-panel" data-icon="bars" data-iconpos="notext" class="icon-scale icon-header ui-nodisc-icon">Menu</a>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+           
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed">
+            <h1></h1>
+            <div data-role="navbar" data-iconpos="left">
+                <ul>
+                    <li><a href="#" data-icon="delete">Hủy bỏ</a></li>
+                    <li><a href="#" data-icon="check">Đặt hàng</a></li>
+                </ul>
+            </div><!-- /navbar -->
+        </div>
+
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="checkout-panel" data-position="right">
             <ul data-role="listview">
                 <li data-icon="delete"><a href="#" data-rel="close">Đóng</a></li>
                 <li><a href="#panel-fixed-page2">Địa chỉ</a></li>
@@ -191,6 +291,8 @@
         <script src="scripts/libs/localforage.js"></script>
         <script src="scripts/libs/underscore.js"></script>
         <script src="scripts/libs/jquery-2.1.4.js"></script>
+        <script src="scripts/libs/spin.js"></script>
+        <script src="scripts/libs/jquery.spin.js"></script>
         <script src="scripts/libs/fastclick.js"></script>
         <script src="scripts/libs/jquery.mobile-1.4.5.js"></script>
         <script src="scripts/libs/backbone.js"></script>
