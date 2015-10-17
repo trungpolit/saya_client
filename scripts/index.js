@@ -16,6 +16,7 @@
     var saya = {};
     saya.config = {
         serviceDomain: "http://saya-backend.16mb.com/saya_backend/",
+        //serviceDomain: "http://localhost/saya_backend/",
         serviceRoot: "app/webroot/cache/",
         serviceRegion: {
             name: 'regions.json',
@@ -37,6 +38,12 @@
     saya.customer_info = {};
     saya.product_expand = '';
     saya.cart_item_remove = {};
+
+    saya.settings = {};
+    saya.settings.max_product_qty = 3;
+    saya.settings.popup_timeout = 3;
+    saya.settings.add_cart_than_max = 'Số lượng sản phẩm không thể đặt vượt quá 3 sản phẩm.';
+
     saya.caculateCartTotalPrice = function (cart) {
 
         var total_price = 0;
@@ -62,6 +69,25 @@
 
             saya.customer_id = value;
         });
+    };
+    saya.openSystemPopup = function (message,timeout) {
+
+        if (typeof timeout === "undefined") {
+
+            timeout = saya.settings.popup_timeout;
+        }
+
+        $("#system-popup-content").html(message);
+        $("#system-popup").popup();
+        $("#system-popup").popup("open", {
+            positionTo: "window",
+            transition: "pop",
+        });
+
+        setTimeout(function () {
+
+            $("#system-popup").popup('close');
+        }, timeout * 1000);
     };
 
     saya.Setting = Backbone.Model.extend({
@@ -203,6 +229,35 @@
                 var cartItem = new saya.CartItemView({ model: model});
                 self.$el.append(cartItem.el);
             });
+
+            return this;
+        },
+    });
+
+    saya.CheckoutListView = Backbone.View.extend({
+        el: $('#checkout-list'),
+        render: function () {
+            var models = this.collection.models;
+            var self = this;
+            var list = '';
+            self.$el.html('');
+            _.each(models, function (model, index) {
+
+                var cartItem = new saya.CheckoutItemView({ model: model });
+                self.$el.append(cartItem.el);
+            });
+
+            return this;
+        },
+    });
+
+    saya.CheckoutCustomerView = Backbone.View.extend({
+        el: $('#checkout-customer'),
+        template: _.template($('#checkout-customer-tpl').html()),
+        render: function () {
+      
+            this.$el.html('');
+            this.$el.append(this.template(this.model));
 
             return this;
         },
@@ -366,6 +421,7 @@
 
             variables.serialize = JSON.stringify(variables);
             variables.price = saya.utli.numberFormat(parseFloat(variables.price));
+            variables.max_qty = saya.settings.max_product_qty;
 
             console.log('Cart item detail:');
             console.log(variables);
@@ -394,16 +450,63 @@
             var new_qty = $self.val();
             var old_qty = product.get('qty');
 
-            if (new_qty == 0) {
+            if (new_qty <= 0) {
 
                 saya.cart_item_remove = item;
                 $("#cart-confirm-remove").popup("open", {});
+                return;
             }
+
+            if (new_qty > saya.settings.max_product_qty) {
+
+                saya.openSystemPopup(saya.settings.add_cart_than_max);
+                return;
+            }
+
+            product.save({ qty: new_qty }, {
+                success: this.onChangeSuccess,
+                error: this.onChangeError,
+            });
+        },
+        onChangeSuccess: function(){
+
+            var total_price = saya.caculateCartTotalPrice(saya.cart.toJSON());
+            saya.displayCartTotalPrice(total_price);
+        },
+        onChangeError: function () {
+
         },
         onClick: function (event) {
 
             var $self = $(event.currentTarget);
             saya.product_expand = $self.data('expand');
+        },
+    });
+
+    saya.CheckoutItemView = Backbone.View.extend({
+        tagName: 'div',
+        template: _.template($('#checkout-item-tpl').html()),
+        initialize: function () {
+            this.render();
+        },
+        render: function () {
+
+            console.log('Render checkout item');
+            var variables = this.model.toJSON();
+
+            var logo_uri = _.isArray(this.model.get('logo_uri')) ? this.model.get('logo_uri')[0] : '';
+            variables.logo_path = saya.config.serviceDomain + logo_uri;
+
+            variables.serialize = JSON.stringify(variables);
+            variables.price = saya.utli.numberFormat(parseFloat(variables.price));
+
+            console.log('Checkout item detail:');
+            console.log(variables);
+
+            var template = this.template(variables);
+
+            this.$el.html(template);
+            return this;
         },
     });
 
@@ -526,6 +629,35 @@
 
         });
 
+        // xử lý khi không xóa item trong giỏ hàng
+        $("#cart-confirm-cancel").on('click', function () {
+
+            if (_.isEmpty(saya.cart_item_remove)) {
+
+                console.log('Cart item needed to remove was empty.');
+                return;
+            }
+
+            var $slider = $('#slider-' + saya.cart_item_remove.id);
+            $slider.val(saya.cart_item_remove.qty);
+            $slider.slider("refresh");
+            saya.cart_item_remove = {};
+        });
+
+        $("#cart-confirm-remove").on("popupafterclose", function (event, ui) {
+
+            if (_.isEmpty(saya.cart_item_remove)) {
+
+                console.log('Cart item needed to remove was empty.');
+                return;
+            }
+
+            var $slider = $('#slider-' + saya.cart_item_remove.id);
+            $slider.val(saya.cart_item_remove.qty);
+            $slider.slider("refresh");
+            saya.cart_item_remove = {};
+        });
+
         $('#checkout').on('click', function () {
 
             var customer = {
@@ -534,6 +666,8 @@
                 mobile2: $('#mobile2').val(),
                 address: $('#address').val(),
             };
+
+            saya.customer_info = customer;
             localforage.setItem('customer_info', customer);
         });
 
@@ -640,11 +774,25 @@
                         return;
                     }
 
+                    saya.customer_info = value;
                     $('#fullname').val(value.fullname);
                     $('#mobile').val(value.mobile);
                     $('#mobile2').val(value.mobile2);
                     $('#address').val(value.address);
                 });
+            } else if (page_id == 'checkout-page') {
+
+                console.log('checkout-page: render data');
+                var checkoutListView = new saya.CheckoutListView({ collection: saya.cart });
+                checkoutListView.render();
+
+                var total_price = saya.caculateCartTotalPrice(saya.cart.toJSON());
+                $('.checkout-total-price').text(saya.utli.numberFormat(total_price));
+
+                var checkoutCustomerView = new saya.CheckoutCustomerView({ model: saya.customer_info });
+                checkoutCustomerView.render();
+
+                $toPage.trigger('create');
             }
         });
     };

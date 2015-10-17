@@ -23,7 +23,7 @@
                     <span class="s">S</span><span class="a-first">a</span><span class="y">y</span><span class="a-last">a</span>
                 </span>
             </h1>
-            <a href="#region-panel" data-icon="bars" data-iconpos="notext" class="btn ui-btn-right icon-scale icon-header ui-nodisc-icon" >Menu</a>
+            <a href="#region-panel" data-icon="bars" data-iconpos="notext" class="btn ui-btn-right icon-scale icon-header ui-nodisc-icon">Menu</a>
         </div><!-- /header -->
 
         <div role="main" class="ui-content">
@@ -39,7 +39,7 @@
                     <option value="">Quận/Thị xã</option>
                 </select>
             </div>
-           <br/><br/>
+            <br /><br />
             <div class="submit">
                 <a href="#category-page" data-role="button" data-transition="slide" id="region_submit">Xác nhận</a>
             </div>
@@ -145,8 +145,10 @@
             </div>
             <div role="main" class="ui-content">
                 <p>Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?</p>
-                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-ok">Đồng ý</a>
-                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-cancel">Hủy bỏ</a>
+                <div class="button-center">
+                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-ok">Đồng ý</a>
+                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-cancel">Hủy bỏ</a>
+                </div>
             </div>
         </div>
     </div>
@@ -163,18 +165,18 @@
         </div><!-- /header -->
 
         <div role="main" class="ui-content">
-            <label for="fullname">Họ và tên:</label>
+            <label for="fullname" class="label"><strong>Họ và tên:</strong></label>
             <input type="text" name="fullname" id="fullname" value="" required>
-            <label for="mobile">Số điện thoại chính:</label>
+            <label for="mobile" class="label"><strong>Số điện thoại chính:</strong></label>
             <input type="number" name="mobile" pattern="[0-9]*" id="mobile" value="" required>
-            <label for="mobile2">Số điện thoại dự phòng:</label>
+            <label for="mobile2" class="label"><strong>Số điện thoại dự phòng:</strong></label>
             <input type="number" name="mobile2" pattern="[0-9]*" id="mobile2" value="">
-            <label for="address">Địa chỉ giao hàng:</label>
-            <textarea cols="40" rows="8" name="address" id="address" required></textarea>
-            <label>Tỉnh/Thành phố của bạn:</label>
-            <p class="region_parent"></p>
-            <label>Quận/Huyện/Thị xã của bạn:</label>
-            <p class="region"></p>
+            <label for="address" class="label"><strong>Địa chỉ giao hàng:</strong></label>
+            <textarea cols="40" rows="8" name="address" id="address"></textarea>
+            <label class="label"><strong>Tỉnh/Thành phố của bạn:</strong></label>
+            <span class="region_parent"></span>
+            <label class="label"><strong>Quận/Huyện/Thị xã của bạn:</strong></label>
+            <span class="region"></span>
         </div><!-- /content -->
 
         <div data-role="footer" data-position="fixed">
@@ -191,17 +193,6 @@
                 <li><a href="#panel-fixed-page2">Thoát</a></li>
             </ul>
         </div>
-
-        <div data-role="popup" id="cart-confirm-remove" data-overlay-theme="b" data-theme="b">
-            <div data-role="header" data-theme="a">
-                <h1>Cảnh báo</h1>
-            </div>
-            <div role="main" class="ui-content">
-                <p>Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?</p>
-                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-ok">Đồng ý</a>
-                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-cancel">Hủy bỏ</a>
-            </div>
-        </div>
     </div>
 
     <div data-role="page" id="checkout-page" data-theme="b">
@@ -216,12 +207,19 @@
         </div><!-- /header -->
 
         <div role="main" class="ui-content">
-           
+            <div id="checkout-list">
+
+            </div>
+            <div class="ui-grid-solo">
+                <h3 class="checkout-total">Tổng tiền: <span class="checkout-total-price"></span></h3>
+            </div>
+            <div id="checkout-customer">
+
+            </div>
         </div><!-- /content -->
 
         <div data-role="footer" data-position="fixed">
-            <h1></h1>
-            <div data-role="navbar" data-iconpos="left">
+            <div data-role="navbar" data-iconpos="top">
                 <ul>
                     <li><a href="#" data-icon="delete">Hủy bỏ</a></li>
                     <li><a href="#" data-icon="check">Đặt hàng</a></li>
@@ -238,20 +236,13 @@
                 <li><a href="#panel-fixed-page2">Thoát</a></li>
             </ul>
         </div>
-
-        <div data-role="popup" id="cart-confirm-remove" data-overlay-theme="b" data-theme="b">
-            <div data-role="header" data-theme="a">
-                <h1>Cảnh báo</h1>
-            </div>
-            <div role="main" class="ui-content">
-                <p>Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?</p>
-                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-ok">Đồng ý</a>
-                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="cart-confirm-cancel">Hủy bỏ</a>
-            </div>
-        </div>
     </div>
 
-    <script type="text/template" id="product-item-tpl">
+    <div id="system-popup" data-theme="a">
+        <div id="system-popup-content" class="ui-content"></div>
+    </div>
+
+        <script type="text/template" id="product-item-tpl">
             <a class="ui-btn ui-btn-icon-bottom ui-icon-carat-d product-item">
                 <div class="ui-grid-a">
                     <div class="ui-block-a">
@@ -269,24 +260,54 @@
                     <div class="description"><%= description %></div>
                 </div>
             </a>
-    </script>
+        </script>
 
-    <script type="text/template" id="cart-item-tpl">
-        <div class="ui-grid-a">
-            <div class="ui-block-a">
-                <a href="#product-page" class="cart-item" data-transition="slide" data-expand="#product-<%= id %>">
-                    <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo"/>
-                    <br />
-                    <small><%= name %></small>
-                    <br />
-                    <small><%= price %>/<%= unit %></small>
-                </a>
+        <script type="text/template" id="cart-item-tpl">
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                    <a href="#product-page" class="cart-item" data-transition="slide" data-expand="#product-<%= id %>">
+                        <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo" />
+                        <br />
+                        <span><%= name %></span>
+                        <br />
+                        <small><%= price %>/<%= unit %></small>
+                    </a>
+                </div>
+                <div class="ui-block-b">
+                    <input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="<%= max_qty %>" value="<%= qty %>" data-highlight="true" class="qty" data-item='<%= serialize %>' />
+                </div>
             </div>
-            <div class="ui-block-b">
-                <input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="100" value="<%= qty %>" data-highlight="true" class="qty" data-item='<%= serialize %>' />
+        </script>
+
+        <script type="text/template" id="checkout-item-tpl">
+            <div class="ui-grid-a">
+                <div class="ui-block-a" style="width:30%">
+                    <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo" />
+                </div>
+                <div class="ui-block-b" style="width:70%">
+                    <strong><%= name %></strong>
+                    <br />
+                    <span>Đơn giá: <%= price %>/<%= unit %></span>
+                    <br />
+                    <span>Số lượng: <%= qty %></span>
+                </div>
             </div>
-        </div> 
-    </script>
+            <hr class="checkout-item-divider" />
+        </script>
+
+        <script type="text/template" id="checkout-customer-tpl">
+            <div class="ui-grid-solo">
+                <strong class="label">Người mua hàng:</strong><br />
+                <span><%= fullname %></span><br />
+                <strong class="label">Số điện thoại:</strong><br />
+                <span><%= mobile %></span><br />
+                <% if(mobile2.length) { %>
+                <span><%= mobile2 %></span><br />
+                <% } %>
+                <strong class="label">Địa chỉ:</strong><br />
+                <span><%= address %></span><br />
+            </div>
+        </script>
 
         <script src="scripts/libs/localforage.js"></script>
         <script src="scripts/libs/underscore.js"></script>

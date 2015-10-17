@@ -1,9 +1,12 @@
 ﻿@font-face {
-    font-family: 'Product Sans';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Product Sans'), local('ProductSans-Regular'), url(fonts/product-sans.woff2) format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+    font-family: 'Roboto';
+    src: url('fonts/Roboto-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('fonts/Roboto-Bold.ttf') format('truetype');
+    font-weight: bold;
 }
 
 * {
@@ -12,6 +15,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    font-family: 'Roboto';
 }
 
 input {
@@ -21,6 +25,8 @@ input {
     -ms-user-select: auto !important;
     user-select: auto !important;
 }
+
+
 
 #slogan {
     color: goldenrod;
@@ -162,4 +168,25 @@ a.cart-item {
 
 .inline-block {
     display:inline-block;
+}
+
+.checkout-item-divider {
+    border: 0;
+    border-bottom: 1px dashed #fff;
+}
+
+.label {
+    color:#E84A5F;
+}
+
+.checkout-total {
+    text-align:center;
+}
+
+.button-center {
+     text-align:center;
+}
+
+.button-center a {
+     margin: 0 auto;
 }
