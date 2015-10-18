@@ -9,6 +9,16 @@
     font-weight: bold;
 }
 
+@font-face {
+    font-family: 'VGEOMELG';
+    src: url('fonts/VGEOMELG.TTF') format('truetype');
+}
+
+@font-face {
+    font-family: 'COUR';
+    src: url('fonts/COUR.TTF') format('truetype');
+}
+
 * {
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -26,64 +36,70 @@ input {
     user-select: auto !important;
 }
 
-
-
-#slogan {
-    color: goldenrod;
+.slogan {
     text-align: center;
 }
 
 .slogan-top {
     margin: 0;
-    font-size: 50px;
+    font-size: 60px;
 }
 
-    .slogan-top span.s {
-        font-family: 'Product Sans';
-        color: #0037cf;
+    .slogan-top span.n {
+        font-family: VGEOMELG;
+        color: #3113E7;
     }
 
-    .slogan-top span.a-first {
-        font-family: 'Product Sans';
-        color: #f6ef1b;
+    .slogan-top span.e1 {
+        font-family: VGEOMELG;
+        color: yellow;
+        font-size: 65px;
     }
 
-    .slogan-top span.y {
-        font-family: 'Product Sans';
-        color: #00b600;
+    .slogan-top span.e2 {
+        font-family: VGEOMELG;
+        color: red;
+        font-size: 65px;
     }
 
-    .slogan-top span.a-last {
-        font-family: 'Product Sans';
-        color: #fa5100;
+    .slogan-top span.d {
+        font-family: VGEOMELG;
+        color: #078F0D;
     }
+
+.slogan-bottom {
+  font-family: COUR;
+  font-size: 14px;
+}
 
 .page-title {
     font-size: 1.8em;
 }
 
-    .page-title span.s {
-        font-family: 'Product Sans';
-        color: #0037cf;
+    .page-title span.n {
+        font-family: VGEOMELG;
+        color: #3113E7;
     }
 
-    .page-title span.a-first {
-        font-family: 'Product Sans';
-        color: #f6ef1b;
+    .page-title span.e1 {
+        font-family: VGEOMELG;
+        color: yellow;
+        font-size: 1.2em;
     }
 
-    .page-title span.y {
-        font-family: 'Product Sans';
-        color: #00b600;
+    .page-title span.e2 {
+        font-family: VGEOMELG;
+        color: red;
+        font-size: 1.2em;
     }
 
-    .page-title span.a-last {
-        font-family: 'Product Sans';
-        color: #fa5100;
+    .page-title span.d{
+        font-family: VGEOMELG;
+        color: #078F0D;
     }
 
-#region_submit {
-    border-radius: 25px;
+.region_submit {
+    border-radius: 25px !important;
 }
 
 .icon-scale {
@@ -114,13 +130,26 @@ input {
 #product-page .description {
     display: none;
     white-space: normal;
-    font-size: 0.75em;
+    font-size: 1em;
     font-weight: normal;
 }
 
 #product-page .description p {
     white-space: normal !important;
     font-size: 1em;
+}
+
+#product-page .product-price {
+    white-space: normal !important;
+    font-size: 1em;
+}
+
+#product-page .ui-block-a{
+    width:80%;
+}
+
+#product-page .ui-block-b{
+    width:20%;
 }
 
 .product-logo {
@@ -189,4 +218,8 @@ a.cart-item {
 
 .button-center a {
      margin: 0 auto;
+}
+
+.requied {
+    color: #ecd9bb;
 }

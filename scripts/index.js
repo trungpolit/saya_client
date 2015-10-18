@@ -17,7 +17,11 @@
     saya.config = {
         serviceDomain: "http://saya-backend.16mb.com/saya_backend/",
         //serviceDomain: "http://localhost/saya_backend/",
+        //serviceDomain: "http://192.168.5.115/saya_backend/",
         serviceRoot: "app/webroot/cache/",
+        serviceSetting: {
+            name: 'settings.json',
+        },
         serviceRegion: {
             name: 'regions.json',
         },
@@ -43,6 +47,8 @@
     saya.settings.max_product_qty = 3;
     saya.settings.popup_timeout = 3;
     saya.settings.add_cart_than_max = 'Số lượng sản phẩm không thể đặt vượt quá 3 sản phẩm.';
+    saya.settings.not_exist_region = 'Quận/Huyện/Thị xã mà bạn đã chọn không còn tồn tại, hãy thực hiện chọn lại vùng khác.';
+    saya.settings.empty_cart = 'Giỏ hàng hiện tại không chứa sản phẩm nào.';
 
     saya.caculateCartTotalPrice = function (cart) {
 
@@ -89,6 +95,134 @@
             $("#system-popup").popup('close');
         }, timeout * 1000);
     };
+    saya.checkRegionSubmit = function (regions) {
+
+        // kiểm tra tính hợp lệ của region nếu khách hàng đã chọn region từ trước
+        if (saya.region_id.length) {
+
+            if (!regions.parent.hasOwnProperty(saya.region_parent_id) || !regions.child.hasOwnProperty(saya.region_id)) {
+
+                saya.openSystemPopup(saya.settings.not_exist_region);
+                setTimeout(function () {
+
+                    $(":mobile-pagecontainer").pagecontainer("change", $('#region-page'), { transition: "slide" });
+                    return;
+                }, (saya.settings.popup_timeout + 0.5) * 1000);
+            }
+
+        }
+    };
+    saya.updateRegionSubmit = function (parent_name,child_name) {
+
+        // nếu chưa tồn tại thông tin về region_submit thì không cần thực hiện update
+        if (!saya.region_id.length) {
+
+            return;
+        }
+
+        console.log('Update parent_name and child_name into localforage.region_submit');
+        saya.region_parent_name = parent_name;
+        saya.region_name = child_name;
+        var region_submit = {
+            parent: saya.region_parent_id,
+            child: saya.region_id,
+            parent_name: saya.region_parent_name,
+            child_name: saya.region_name,
+        };
+        console.log('region_submit:');
+        console.log(region_submit);
+        localforage.setItem('region_submit', region_submit);
+    };
+    saya.initializePage = function () {
+
+        // thực hiện điều hướng sang #category-page nếu đã được thiết lập region_submit
+        console.log('Check whether navigate to #region-page or #category-page');
+        localforage.getItem('region_submit', function (err, value) {
+
+            if (_.isObject(value) && value.parent.length && value.child.length) {
+
+                console.log('navigate to #category-page');
+                window.location.hash = '#category-page';
+
+                console.log('get data from localforage.region_submit:');
+                console.log(value);
+
+                // thiết lập giá trị liên quan tới region vào biến toàn cục
+                saya.region_parent_id = value.parent;
+                saya.region_id = value.child;
+                saya.region_parent_name = value.parent_name;
+                saya.region_name = value.child_name;
+            } else {
+
+                console.log('navigate to #region-page');
+                window.location.hash = '#region-page';
+            }
+
+            $.mobile.initializePage();
+        });
+    };
+    saya.fecthSetting = function () {
+
+        $('body').spin();
+        var setting = new saya.Setting();
+        var fecthSetting = setting.fetch();
+        fecthSetting.done(function (data, textStatus, jqXHR) {
+
+            localforage.setItem('settings', data);
+
+            // ghi đè cấu hình settings nhận từ server xuống client
+            _.each(data, function (value, key) {
+
+                console.log('override saya.settings.'+key+' from server');
+                if (_.isObject(value)) {
+
+                    return;
+                }
+                saya.settings[key] = value;
+            });
+
+            // kiểm tra tính hợp lệ của region nếu khách hàng đã chọn region từ trước
+            var regions = data.regions;
+            saya.checkRegionSubmit(regions);
+
+            // thực hiện update tên name của region nhận từ server
+            var region_parent_name = regions.parent[saya.region_parent_id];
+            var region_name = regions.child[saya.region_id];
+            saya.updateRegionSubmit(region_parent_name, region_name);
+            $('body').spin(false);
+        });
+
+        fecthSetting.fail(function (jqXHR, textStatus, errorThrown) {
+
+            alert(errorThrown);
+            $('body').spin(false);
+        });
+    };
+    saya.exitApp = function () {
+
+        console.log('Exit app');
+        navigator.app.exitApp();
+    };
+    saya.emptyCart = function () {
+
+        // lấy ra các sản phẩm chứa trong giỏ hàng
+        saya.cart.fetch({
+            success: function (collection, response, options) {
+
+                // nếu giỏ hàng không rỗng, thì thực hiện xóa từng sản phẩm trong giỏ hàng
+                var cart = saya.cart.toJSON();
+                if (cart.length) {
+
+                    console.log('empty cart');
+                    _.each(cart, function (value, index) {
+
+                        var item_id = value.id;
+                        collection.get(item_id).destroy();
+                    });
+                }
+            },
+        });
+    };
 
     saya.Setting = Backbone.Model.extend({
         initialize: function () {
@@ -96,7 +230,7 @@
         },
         url: function () {
 
-            var url = this.config.serviceDomain + this.config.serviceRoot + this.config.serviceRegion.name;
+            var url = this.config.serviceDomain + this.config.serviceRoot + this.config.serviceSetting.name;
             console.log('Setting: fetch remote data from "' + url + '"');
             return url;
         },
@@ -355,6 +489,7 @@
                 success: function (collection, response, options) {
                     
                     console.log('Carts was get successful.');
+                    // trường hợp giỏ hàng rỗng, thực hiện tạo ra item đầu tiên
                     if (!response) {
                         console.log('Carts was empty, create first item');
                         item.qty = 1;
@@ -364,8 +499,10 @@
                         });
                         return;
                     }
+
+                    // trường hợp giỏ hàng đã tồn tại item
                     var model = collection.get(item.id);
-                    console.log(model);
+                    // trường hợp giỏ hàng chưa tồn tại item có id hiện tại, thực hiện tạo mới item này trong giỏ hàng
                     if (!model) {
 
                         console.log('Carts dont have any item with id=' + item.id + ', create a new item');
@@ -376,8 +513,17 @@
                         });
                         return;
                     }
-                    console.log('Carts had the item with id=' + item.id + ', increase item qty to ' + (model.get('qty') + 1));
-                    model.save({ qty: model.get('qty') + 1 }, {
+                    // trường hợp giỏ hàng đã tồn tại item với id hiện tại, thì thực hiện  thêm +1 vao qty của item trong giỏ hàng
+                    var new_qty = model.get('qty') + 1;
+                    // thực hiện kiểm tra nếu số lượng qty vượt quá số lượng qty cho phép thì thực hiện popup cảnh báo
+                    if (new_qty > saya.settings.max_product_qty) {
+
+                        saya.openSystemPopup(saya.settings.add_cart_than_max);
+                        return false;
+                    }
+                    // thực hiện +1 vào qty
+                    console.log('Carts had the item with id=' + item.id + ', increase item qty to ' + new_qty);
+                    model.save({ qty: new_qty }, {
                         success: thisView.onCartCreateSuccess,
                         error: thisView.onCartCreateError,
                     });
@@ -550,41 +696,76 @@
     document.addEventListener('deviceready', onDeviceReady.bind(this), false);
 
     function onDeviceReady() {
-        // Handle the Cordova pause and resume events
-        document.addEventListener( 'pause', onPause.bind( this ), false );
-        document.addEventListener('resume', onResume.bind(this), false);
-
-        saya.setCustomerId();
 
         // FastClick.attach(document.body);
 
-        $('#region_parent').on('change', function () {
+        document.addEventListener( 'pause', onPause.bind( this ), false );
+        document.addEventListener('resume', onResume.bind(this), false);
 
+        saya.initializePage();
+        saya.setCustomerId();
+        saya.fecthSetting();
+
+        $('.exit-app').on('click', function () {
+
+            saya.exitApp();
+            return false;
+        });
+
+        $('a.menu').on('click', function () {
+
+            var hash = $(this).attr('href');
+            if (hash == window.location.hash) {
+
+                return false;
+            }
+        });
+
+        $('select.region-parent').on('change', function () {
+
+            console.log('select.region-parent was trigger change');
             var parent = $(this).val();
-            localforage.getItem('regions', function (err, regions) {
+            var $self = $(this);
+            localforage.getItem('settings', function (err, value) {
                 if (err) {
 
                     console.error('Oh noes!');
                     console.log(err);
                 } else {
 
+                    var regions = value.regions;
                     var region_child = regions.child[parent];
                     var opts = '<option value="">Quận/Huyện/Thị xã</option>';
                     opts += saya.helper.renderOpts(region_child);
+                    var $region_child = $self.closest('.region').find('select.region-child');
+                    $region_child.html(opts);
+                    if (saya.region_id.length) {
 
-                    $('#region_child').html(opts);
-                    $('#region_child').selectmenu("refresh");
+                        $region_child.val(saya.region_id);
+                    }
+                    $region_child.selectmenu("refresh");
                 }
             });
         });
 
-        $('#region_submit').on("click", function () {
+        $('.region_submit').on("click", function () {
 
-            var parent = $('#region_parent').val();
-            var child = $('#region_child').val();
+            var $region_parent = $(this).closest('div[role="main"]').find('select.region-parent');
+            var $region_child = $(this).closest('div[role="main"]').find('select.region-child');
 
-            var parent_name = $('#region_parent').find('option:selected').text();
-            var child_name = $('#region_child').find('option:selected').text();
+            var parent = $region_parent.val();
+            var child = $region_child.val();
+
+            var parent_name = $region_parent.find('option:selected').text();
+            var child_name = $region_child.find('option:selected').text();
+
+            // xác định xem có phải xóa toàn bộ giỏ hàng hay không?
+            // sẽ xóa giỏ hàng nếu khách hàng thay đổi region
+            var empty_cart = $(this).data('empty_cart');
+            if (empty_cart && saya.region_id != child) {
+
+                saya.emptyCart();
+            }
 
             saya.region_parent_id = parent;
             saya.region_id = child;
@@ -597,9 +778,11 @@
                 return false;
             }
 
-            localforage.setItem('region_submit', { parent: parent, child: child }, function (err, value) {
-
-                //$(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slide" });
+            localforage.setItem('region_submit', {
+                parent: parent,
+                child: child,
+                parent_name: parent_name,
+                child_name: child_name,
             });
         });
 
@@ -626,7 +809,6 @@
                 $(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slide" });
                 return false;
             }
-
         });
 
         // xử lý khi không xóa item trong giỏ hàng
@@ -658,38 +840,36 @@
             saya.cart_item_remove = {};
         });
 
+        $('.checkout-ok').on('click', function () {
+
+            saya.openSystemPopup(saya.settings.checkout_success);
+            return false;
+        });
+
         $('#checkout').on('click', function () {
 
             var customer = {
-                fullname: $('#fullname').val(),
-                mobile: $('#mobile').val(),
-                mobile2: $('#mobile2').val(),
-                address: $('#address').val(),
+                fullname: $.trim($('#fullname').val()),
+                mobile: $.trim($('#mobile').val()),
+                mobile2: $.trim($('#mobile2').val()),
+                address: $.trim($('#address').val()),
             };
+
+            if (!customer.fullname.length || !customer.mobile.length || !customer.address.length) {
+
+                saya.openSystemPopup(saya.settings.not_fullfill_form);
+                return false;
+            }
 
             saya.customer_info = customer;
             localforage.setItem('customer_info', customer);
         });
 
-        $('body').spin();
-        var setting = new saya.Setting();
-        var fecthSetting = setting.fetch();
-        fecthSetting.done(function (data, textStatus, jqXHR) {
+        $('#checkout-confirm-yes').on('click', function () {
 
-            localforage.setItem('regions', data);
-            var region_parent = data.parent;
-            var opts = '<option value="">Tỉnh/thành phố</option>';
-            opts += saya.helper.renderOpts(region_parent);
-            $('#region_parent').html(opts);
-            $('#region_parent').selectmenu("refresh");
-            $('#region_parent').trigger('change');
-            $('body').spin(false);
-        });
-
-        fecthSetting.fail(function (jqXHR, textStatus, errorThrown) {
-
-            alert(errorThrown);
-            $.mobile.loading("hide");
+            saya.emptyCart();
+            $(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slide" });
+            return false;
         });
 
         $(document).on("pagecontainerbeforeshow", function (event, ui) {
@@ -698,26 +878,36 @@
             var $toPage = ui.toPage;
             var page_id = $toPage.attr('id');
             console.log('page_id: ' + page_id);
+
             if (page_id == 'region-page') {
 
-                console.log('region-page: fetch and render remote data');
-                var setting = new saya.Setting();
-                var fecthSetting = setting.fetch();
-                fecthSetting.done(function (data, textStatus, jqXHR) {
+                var $region_parent = $toPage.find('select.region-parent');
+                console.log('region-page: render data from localforage.settings');
+                localforage.getItem('settings', function (err, value) {
 
-                    localforage.setItem('regions', data);
-                    var region_parent = data.parent;
-                    $('#region_parent').html(saya.helper.renderOpts(region_parent));
-                    $('#region_parent').selectmenu("refresh");
-                    $('#region_parent').trigger('change');
+                    var region_parent = value.regions.parent;
+                    var opts = '<option value="">Tỉnh/Thành phố</option>';
+                    opts += saya.helper.renderOpts(region_parent);
+                    $region_parent.html(opts);
+                    $region_parent.selectmenu("refresh");
+                    $region_parent.trigger('change');
                 });
+            } else if (page_id == 'region-edit-page') {
 
-                fecthSetting.fail(function (jqXHR, textStatus, errorThrown) {
+                var $region_parent = $toPage.find('select.region-parent');
+                console.log('region-edit-page: render data from localforage.settings');
+                localforage.getItem('settings', function (err, value) {
 
-                    alert(errorThrown);
+                    var region_parent = value.regions.parent;
+                    $region_parent.html(saya.helper.renderOpts(region_parent));
+                    if (saya.region_parent_id.length) {
+
+                        $region_parent.val(saya.region_parent_id);
+                    }
+                    $region_parent.selectmenu("refresh");
+                    $region_parent.trigger('change');
                 });
-
-            }else if (page_id == 'category-page') {
+            } else if (page_id == 'category-page') {
 
                 console.log('category-page: fetch and render remote data');
                 $('body').spin();
@@ -743,24 +933,54 @@
                 fecthProducts.done(function (data, textStatus, jqXHR) {
 
                     localforage.setItem('products', data);
-                    var productListView = new saya.ProductListView({ collection: products });
-                    var productListViewHtml = productListView.render();
-                    $toPage.find('div[role="main"]').append(productListViewHtml.el);
-                    $toPage.find('ul[data-role="listview"]').listview();
-                    productListView.expand();
+                    if (data.length) {
+
+                        var productListView = new saya.ProductListView({ collection: products });
+                        var productListViewHtml = productListView.render();
+                        $toPage.find('div[role="main"]').append(productListViewHtml.el);
+                        $toPage.find('ul[data-role="listview"]').listview();
+                        productListView.expand();
+                    } else {
+
+                        $toPage.find('div[role="main"]').html(saya.settings.empty_product_in_region);
+                        $toPage.trigger('create');
+                    }
+              
                     $('body').spin(false);
                 });
             } else if (page_id == 'cart-page') {
 
-                console.log('cart-page: render data');
-                var cartListView = new saya.CartListView({ collection: saya.cart });
-                var cartListViewHtml = cartListView.render();
-                var $cartPage = $toPage.find('#cart-list');
+                console.log('cart-page: saya.cart fetch');
+                saya.cart.fetch({
+                    success: function (collection, response, options) {
 
-                $cartPage.html('');
-                $cartPage.append(cartListViewHtml.el);
+                        var cart = saya.cart.toJSON();
+                        var total_price = saya.caculateCartTotalPrice(cart);
+                        saya.displayCartTotalPrice(total_price);
 
-                $toPage.trigger('create');
+                        var $cartPage = $toPage.find('#cart-list');
+                        var $cartFooter = $toPage.find('div[data-role="footer"]');
+
+                        console.log('cart-page: render data from saya.cart');
+                        if (cart.length) {
+
+                            console.log('cart-page: render data from saya.cart');
+                            var cartListView = new saya.CartListView({ collection: saya.cart });
+                            var cartListViewHtml = cartListView.render();
+
+                            $cartPage.html('');
+                            $cartPage.append(cartListViewHtml.el);
+                            $cartFooter.find('a[href="#customer-page"]').show();
+                        } else {
+
+                            var message = '<div class="ui-content">' + saya.settings.empty_cart + '</div>';
+                            $cartPage.html(message);
+                            $cartFooter.find('a[href="#customer-page"]').hide();
+                        }
+
+                        $toPage.trigger('create');
+                    },
+                });
             } else if (page_id == 'customer-page') {
 
                 console.log('customer-page: render data');
@@ -793,6 +1013,10 @@
                 checkoutCustomerView.render();
 
                 $toPage.trigger('create');
+            } else if (page_id == 'about-page') {
+
+                console.log('about-page: render data');
+                $toPage.find('div[role="main"]').html(saya.settings.about_us);
             }
         });
     };
