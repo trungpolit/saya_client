@@ -224,3 +224,7 @@ a.cart-item {
     color: #ecd9bb;
 }
 
+.marquee {
+  width: 100%;
+  overflow: hidden;
+}

@@ -15,8 +15,8 @@
 
     var saya = {};
     saya.config = {
-        serviceDomain: "http://saya-backend.16mb.com/saya_backend/",
-        //serviceDomain: "http://localhost/saya_backend/",
+        //serviceDomain: "http://saya-backend.16mb.com/saya_backend/",
+        serviceDomain: "http://localhost/saya_backend/",
         //serviceDomain: "http://192.168.5.115/saya_backend/",
         serviceRoot: "app/webroot/cache/",
         serviceSetting: {
@@ -32,11 +32,16 @@
             path: 'products/',
             pattern: '{region_id}_{category_id}.json',
         },
+        serviceNotification: {
+            path: 'notifications/',
+            pattern: '{region_id}_{year_month}.json',
+        },
     };
     // trạng thái của network
     saya.networkStatus = 1;
     // settingPromise xác định thời điểm khi nào lấy được setting thành công
     saya.settingPromise = {};
+    saya.notificationPromise = {};
     saya.openSystemPopupTimeout = null;
     saya.region_parent_id = '';
     saya.region_id = '';
@@ -97,7 +102,7 @@
         });
 
         // thực hiện gán tham chiếu timeout, để điều khiển bật tắt
-        this.openSystemPopupTimeout= setTimeout(function () {
+        this.openSystemPopupTimeout = setTimeout(function () {
 
             $("#system-popup").popup('close');
         }, timeout * 1000);
@@ -114,10 +119,7 @@
     };
     saya.checkRegionSubmit = function (regions) {
 
-        console.log('checkRegionSubmit');
-        console.log(saya.region_parent_id);
-        console.log(saya.region_id);
-        console.log(regions);
+        console.log('checkRegionSubmit ...');
         // kiểm tra tính hợp lệ của region nếu khách hàng đã chọn region từ trước
         if (saya.region_id.length) {
 
@@ -127,6 +129,7 @@
                 !regions.child[saya.region_parent_id].hasOwnProperty(saya.region_id)
                 ) {
 
+                console.log('regions are invalid, change to #region-page');
                 saya.openSystemPopup(saya.settings.not_exist_region);
                 setTimeout(function () {
 
@@ -247,8 +250,37 @@
 
         fecthSetting.fail(function (jqXHR, textStatus, errorThrown) {
 
-            alert('fecthSetting was failed');
+            console.log('fecthSetting was failed');
+            deferred.reject(errorThrown);
             $('body').spin(false);
+        });
+
+        return deferred.promise();
+    };
+    saya.fecthNotification = function () {
+
+        var deferred = $.Deferred();
+        var notificationCollection = new saya.NotificationCollection();
+        var fecthNotification = notificationCollection.fetch();
+        fecthNotification.done(function (data, textStatus, jqXHR) {
+
+            localforage.setItem('notifications', data, function (err, value) {
+
+                if (!value) {
+
+                    deferred.reject(err);
+                    return;
+                }
+
+                deferred.resolve(value)
+                return;
+            });
+        });
+
+        fecthNotification.fail(function (jqXHR, textStatus, errorThrown) {
+
+            console.log('fecthNotification was failed');
+            deferred.reject(errorThrown);
         });
 
         return deferred.promise();
@@ -341,6 +373,12 @@
         },
     });
 
+    saya.Notification = Backbone.Model.extend({
+        initialize: function () {
+            this.config = saya.config;
+        },
+    });
+
     saya.Cart = Backbone.Model.extend({
         initialize: function () {
             this.config = saya.config;
@@ -369,6 +407,21 @@
             this.config.serviceProduct.name = this.config.serviceProduct.pattern.replace('{region_id}', saya.region_id).replace('{category_id}', saya.category_id);
             var url = this.config.serviceDomain + this.config.serviceRoot + this.config.serviceProduct.path + this.config.serviceProduct.name;
             console.log('ProductCollection: fetch remote data from "' + url + '"');
+            return url;
+        },
+    });
+
+    saya.NotificationCollection = Backbone.Collection.extend({
+        initialize: function () {
+            this.config = saya.config;
+        },
+        model: saya.Notification,
+        url: function () {
+
+            var year_month = saya.utli.getYearMonth()
+            this.config.serviceNotification.name = this.config.serviceNotification.pattern.replace('{region_id}', saya.region_id).replace('{year_month}', year_month);
+            var url = this.config.serviceDomain + this.config.serviceRoot + this.config.serviceNotification.path + this.config.serviceNotification.name;
+            console.log('NotificationCollection: fetch remote data from "' + url + '"');
             return url;
         },
     });
@@ -783,6 +836,22 @@
         });
         return uuid;
     };
+    saya.utli.getYearMonth = function () {
+
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+        var year_month = yyyy.toString() + mm.toString();
+        return year_month;
+    };
 
     // khởi tạo luôn cartCollection toàn cục, dùng chung cho cả ứng dụng
     saya.cart = new saya.CartCollection();
@@ -1037,15 +1106,52 @@
                 $('body').spin();
                 var categories = new saya.CategoryCollection();
                 var fecthCategories = categories.fetch();
-                $toPage.find('div[role="main"]').html('');
+                $toPage.find('#catgory-list').html('');
                 fecthCategories.done(function (data, textStatus, jqXHR) {
 
                     localforage.setItem('categories', data);
                     var categoryListView = new saya.CategoryListView({ collection: categories });
                     var categoryListViewHtml = categoryListView.render();
-                    $toPage.find('div[role="main"]').append(categoryListViewHtml.el);
+                    $toPage.find('#catgory-list').append(categoryListViewHtml.el);
                     $toPage.find('ul[data-role="listview"]').listview();
                     $('body').spin(false);
+                });
+
+                saya.notificationPromise = saya.fecthNotification();
+                saya.notificationPromise.done(function (notifications) {
+
+                    console.log('notifications:');
+                    console.log(notifications);
+
+                    if (_.isEmpty(notifications)) {
+
+                        return;
+                    }
+
+                    (function myLoop(i) {
+
+                        $('.marquee').html(notifications[i-1].description);
+                        $('.marquee').marquee({
+                            pauseOnHover: true,
+                        }).bind('finished', function () {
+                            $(this).marquee('destroy');
+                            $(this).html(notifications[i - 1].description).marquee();
+                            if (--i) {
+
+                                myLoop(i);
+                            } else {
+
+                                i = notifications.length;
+                                myLoop(i);
+                            }
+                        });
+                    })(notifications.length);
+                });
+
+                saya.notificationPromise.fail(function () {
+
+                    $('.marquee').html('');
+                    $('.marquee').marquee('destroy');
                 });
             } else if (page_id == 'product-page') {
 
