@@ -33,6 +33,11 @@
             pattern: '{region_id}_{category_id}.json',
         },
     };
+    // trạng thái của network
+    saya.networkStatus = 1;
+    // settingPromise xác định thời điểm khi nào lấy được setting thành công
+    saya.settingPromise = {};
+    saya.openSystemPopupTimeout = null;
     saya.region_parent_id = '';
     saya.region_id = '';
     saya.region_parent_name = '';
@@ -49,6 +54,7 @@
     saya.settings.add_cart_than_max = 'Số lượng sản phẩm không thể đặt vượt quá 3 sản phẩm.';
     saya.settings.not_exist_region = 'Quận/Huyện/Thị xã mà bạn đã chọn không còn tồn tại, hãy thực hiện chọn lại vùng khác.';
     saya.settings.empty_cart = 'Giỏ hàng hiện tại không chứa sản phẩm nào.';
+    saya.settings.offline_network = 'Hãy bật dữ liệu mạng hoặc wifi.';
 
     saya.caculateCartTotalPrice = function (cart) {
 
@@ -76,11 +82,11 @@
             saya.customer_id = value;
         });
     };
-    saya.openSystemPopup = function (message,timeout) {
+    saya.openSystemPopup = function (message, timeout) {
 
         if (typeof timeout === "undefined") {
 
-            timeout = saya.settings.popup_timeout;
+            timeout = this.settings.popup_timeout;
         }
 
         $("#system-popup-content").html(message);
@@ -90,17 +96,36 @@
             transition: "pop",
         });
 
-        setTimeout(function () {
+        // thực hiện gán tham chiếu timeout, để điều khiển bật tắt
+        this.openSystemPopupTimeout= setTimeout(function () {
 
             $("#system-popup").popup('close');
         }, timeout * 1000);
     };
+    saya.openNetworkPopup = function (message) {
+
+        console.log('NetworkPopup is opening ...');
+        $("#network-popup-content").html(message);
+        $("#network-popup").popup();
+        $("#network-popup").popup("open", {
+            positionTo: "window",
+            transition: "pop",
+        });
+    };
     saya.checkRegionSubmit = function (regions) {
 
+        console.log('checkRegionSubmit');
+        console.log(saya.region_parent_id);
+        console.log(saya.region_id);
+        console.log(regions);
         // kiểm tra tính hợp lệ của region nếu khách hàng đã chọn region từ trước
         if (saya.region_id.length) {
 
-            if (!regions.parent.hasOwnProperty(saya.region_parent_id) || !regions.child.hasOwnProperty(saya.region_id)) {
+            if (
+                !regions.parent.hasOwnProperty(saya.region_parent_id) ||
+                !regions.child.hasOwnProperty(saya.region_parent_id) ||
+                !regions.child[saya.region_parent_id].hasOwnProperty(saya.region_id)
+                ) {
 
                 saya.openSystemPopup(saya.settings.not_exist_region);
                 setTimeout(function () {
@@ -108,11 +133,16 @@
                     $(":mobile-pagecontainer").pagecontainer("change", $('#region-page'), { transition: "slide" });
                     return;
                 }, (saya.settings.popup_timeout + 0.5) * 1000);
+
+                return false;
             }
 
+            return true;
         }
+
+        return false;
     };
-    saya.updateRegionSubmit = function (parent_name,child_name) {
+    saya.updateRegionSubmit = function (parent_name, child_name) {
 
         // nếu chưa tồn tại thông tin về region_submit thì không cần thực hiện update
         if (!saya.region_id.length) {
@@ -152,6 +182,26 @@
                 saya.region_id = value.child;
                 saya.region_parent_name = value.parent_name;
                 saya.region_name = value.child_name;
+
+                console.log('When saya.fetchSetting() was done, check whether localforage.region_submit is valid or not?');
+                saya.settingPromise.done(function (setting) {
+
+                    // kiểm tra tính hợp lệ của region nếu khách hàng đã chọn region từ trước
+                    var regions = setting.regions;
+                    console.log('Check whether localforage.region_submit is exist');
+                    var check_region_submit = saya.checkRegionSubmit(regions);
+
+                    // thực hiện update tên name của region nhận từ server
+                    if (check_region_submit) {
+
+                        console.log('localforage.region_submit is exist');
+                        var region_parent_name = regions.parent[saya.region_parent_id];
+                        var region_name = regions.child[saya.region_parent_id][saya.region_id];
+                        console.log('update region_parent_name & region_name returned from server to localforage.region_submit');
+                        saya.updateRegionSubmit(region_parent_name, region_name);
+                    }
+                });
+
             } else {
 
                 console.log('navigate to #region-page');
@@ -164,16 +214,27 @@
     saya.fecthSetting = function () {
 
         $('body').spin();
+        var deferred = $.Deferred();
         var setting = new saya.Setting();
         var fecthSetting = setting.fetch();
         fecthSetting.done(function (data, textStatus, jqXHR) {
 
-            localforage.setItem('settings', data);
+            localforage.setItem('settings', data, function (err, value) {
+
+                if (!value) {
+
+                    deferred.reject(err);
+                    return;
+                }
+
+                deferred.resolve(value)
+                return;
+            });
 
             // ghi đè cấu hình settings nhận từ server xuống client
             _.each(data, function (value, key) {
 
-                console.log('override saya.settings.'+key+' from server');
+                console.log('override saya.settings.' + key + ' from server');
                 if (_.isObject(value)) {
 
                     return;
@@ -181,22 +242,16 @@
                 saya.settings[key] = value;
             });
 
-            // kiểm tra tính hợp lệ của region nếu khách hàng đã chọn region từ trước
-            var regions = data.regions;
-            saya.checkRegionSubmit(regions);
-
-            // thực hiện update tên name của region nhận từ server
-            var region_parent_name = regions.parent[saya.region_parent_id];
-            var region_name = regions.child[saya.region_id];
-            saya.updateRegionSubmit(region_parent_name, region_name);
             $('body').spin(false);
         });
 
         fecthSetting.fail(function (jqXHR, textStatus, errorThrown) {
 
-            alert(errorThrown);
+            alert('fecthSetting was failed');
             $('body').spin(false);
         });
+
+        return deferred.promise();
     };
     saya.exitApp = function () {
 
@@ -222,6 +277,36 @@
                 }
             },
         });
+    };
+    saya.changeHomePage = function () {
+
+        var $active_page = $(":mobile-pagecontainer").pagecontainer("getActivePage");
+        var active_page_selector = $active_page.attr('id');
+        console.log('active page is #' + active_page_selector);
+        if (saya.region_id.length) {
+
+            if (active_page_selector !== 'category-page') {
+
+                console.log('#category-page is changing ...');
+                $(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slide" });
+            } else {
+
+                console.log('#category-page is reloading ...');
+                $(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slide", allowSamePageTransition: true, changeHash: false });
+            }
+        } else {
+
+            if (active_page_selector !== 'region-page') {
+
+                console.log('#region-page is changing ...');
+                $(":mobile-pagecontainer").pagecontainer("change", $('#region-page'), { transition: "slide" });
+            } else {
+
+                console.log('#region-page is reloading &  fecthSetting is fecthing...');
+                saya.settingPromise = saya.fecthSetting();
+                $(":mobile-pagecontainer").pagecontainer("change", $('#region-page'), { transition: "slide", allowSamePageTransition: true, changeHash: false });
+            }
+        }
     };
 
     saya.Setting = Backbone.Model.extend({
@@ -321,19 +406,20 @@
             _.each(models, function (model, index) {
 
                 var productItem = new saya.ProductItemView({ model: model, index: index });
+                // thực hiện hiện thị chi tiết 1 product, nếu là sự kiện click vào product trong giỏ hàng
                 self.$el.append(productItem.el);
             });
 
             return this;
         },
-        expand: function () {
+        expand: function () { // thực hiện hiện thị thông tin chi tiết của 1 product, khi click vào product trong giỏ hàng cart
 
             if (!saya.product_expand.length) {
 
                 return;
             }
 
-            console.log('Product with id=' + saya.product_expand+' need to expand');
+            console.log('Product with id=' + saya.product_expand + ' need to expand');
             var $product_expand = $(saya.product_expand);
             console.log($product_expand);
             saya.product_expand = '';
@@ -343,10 +429,12 @@
             console.log('Product needed to expand has offset:');
             console.log(offset);
 
-            console.log('Scroll to expanded product');
-            $('html, body').animate({
+            console.log('Scroll to expanded product with offset.top: ' + offset.top);
+            $(':mobile-pagecontainer').animate({
                 scrollTop: offset.top
             }, 2000);
+
+            // $.mobile.silentScroll(offset.top);
 
             $product_expand.trigger('click');
         },
@@ -360,7 +448,7 @@
             var list = '';
             _.each(models, function (model, index) {
 
-                var cartItem = new saya.CartItemView({ model: model});
+                var cartItem = new saya.CartItemView({ model: model });
                 self.$el.append(cartItem.el);
             });
 
@@ -389,7 +477,7 @@
         el: $('#checkout-customer'),
         template: _.template($('#checkout-customer-tpl').html()),
         render: function () {
-      
+
             this.$el.html('');
             this.$el.append(this.template(this.model));
 
@@ -433,7 +521,7 @@
             this.render();
         },
         render: function () {
-           
+
             console.log('Render product item');
             var variables = this.model.toJSON();
 
@@ -458,7 +546,7 @@
             "click .cart": "onCartButtonClick",
             "click": "onProductItemClick",
         },
-        onProductItemClick: function(event){
+        onProductItemClick: function (event) {
 
             console.log('Tap on product item was trigger');
             var $self = this.$('a.product-item');
@@ -476,7 +564,7 @@
             }
         },
         onCartButtonClick: function (event) {
-           
+
             console.log('Tap on cart button was trigger');
             event.stopPropagation();
             var $self = $(event.currentTarget);
@@ -487,7 +575,7 @@
 
             saya.cart.fetch({
                 success: function (collection, response, options) {
-                    
+
                     console.log('Carts was get successful.');
                     // trường hợp giỏ hàng rỗng, thực hiện tạo ra item đầu tiên
                     if (!response) {
@@ -514,7 +602,7 @@
                         return;
                     }
                     // trường hợp giỏ hàng đã tồn tại item với id hiện tại, thì thực hiện  thêm +1 vao qty của item trong giỏ hàng
-                    var new_qty = model.get('qty') + 1;
+                    var new_qty = parseInt(model.get('qty')) + 1;
                     // thực hiện kiểm tra nếu số lượng qty vượt quá số lượng qty cho phép thì thực hiện popup cảnh báo
                     if (new_qty > saya.settings.max_product_qty) {
 
@@ -536,7 +624,7 @@
             $(":mobile-pagecontainer").pagecontainer("change", "#cart-page", { transition: "slide" });
         },
         onCartCreateSuccess: function () {
-            
+
             console.log('Carts was updated, re-render #cart-page');
             var total_price = saya.caculateCartTotalPrice(saya.cart.toJSON());
             saya.displayCartTotalPrice(total_price);
@@ -614,7 +702,7 @@
                 error: this.onChangeError,
             });
         },
-        onChangeSuccess: function(){
+        onChangeSuccess: function () {
 
             var total_price = saya.caculateCartTotalPrice(saya.cart.toJSON());
             saya.displayCartTotalPrice(total_price);
@@ -624,8 +712,14 @@
         },
         onClick: function (event) {
 
+            console.log('.cart-item click event was trigger')
             var $self = $(event.currentTarget);
             saya.product_expand = $self.data('expand');
+            var category_id = $self.data('category_id');
+
+            // thực hiện  set lại state của saya.category_id để khi quay về trang product-page hiện thị đúng
+            console.log('Reset saya.category_id = ' + category_id);
+            saya.category_id = category_id;
         },
     });
 
@@ -691,7 +785,7 @@
     };
 
     // khởi tạo luôn cartCollection toàn cục, dùng chung cho cả ứng dụng
-   saya.cart = new saya.CartCollection();
+    saya.cart = new saya.CartCollection();
 
     document.addEventListener('deviceready', onDeviceReady.bind(this), false);
 
@@ -699,12 +793,19 @@
 
         // FastClick.attach(document.body);
 
-        document.addEventListener( 'pause', onPause.bind( this ), false );
+        document.addEventListener('pause', onPause.bind(this), false);
         document.addEventListener('resume', onResume.bind(this), false);
 
+        // xử lý khi thay đổi mạng
+        document.addEventListener('offline', onOffline.bind(this), false);
+        document.addEventListener('online', onOnline.bind(this), false);
+
+        // vô hiệu hóa nút back
+        document.addEventListener("backbutton", onBackKeyDown.bind(this), false);
+
+        saya.settingPromise = saya.fecthSetting();
         saya.initializePage();
         saya.setCustomerId();
-        saya.fecthSetting();
 
         $('.exit-app').on('click', function () {
 
@@ -726,30 +827,35 @@
             console.log('select.region-parent was trigger change');
             var parent = $(this).val();
             var $self = $(this);
+
+            if (!parent) {
+
+                var opts = '<option value="">Quận/Huyện/Thị xã</option>';
+                var $region_child = $self.closest('.region').find('select.region-child');
+                $region_child.html(opts);
+                $region_child.selectmenu("refresh");
+                return;
+            }
+
             localforage.getItem('settings', function (err, value) {
-                if (err) {
 
-                    console.error('Oh noes!');
-                    console.log(err);
-                } else {
+                var regions = value.regions;
+                var region_child = regions.child[parent];
+                var opts = '<option value="">Quận/Huyện/Thị xã</option>';
+                opts += saya.helper.renderOpts(region_child);
+                var $region_child = $self.closest('.region').find('select.region-child');
+                $region_child.html(opts);
+                if (saya.region_id.length) {
 
-                    var regions = value.regions;
-                    var region_child = regions.child[parent];
-                    var opts = '<option value="">Quận/Huyện/Thị xã</option>';
-                    opts += saya.helper.renderOpts(region_child);
-                    var $region_child = $self.closest('.region').find('select.region-child');
-                    $region_child.html(opts);
-                    if (saya.region_id.length) {
-
-                        $region_child.val(saya.region_id);
-                    }
-                    $region_child.selectmenu("refresh");
+                    $region_child.val(saya.region_id);
                 }
+                $region_child.selectmenu("refresh");
             });
         });
 
         $('.region_submit').on("click", function () {
 
+            console.log('.region_submit click event was trigger');
             var $region_parent = $(this).closest('div[role="main"]').find('select.region-parent');
             var $region_child = $(this).closest('div[role="main"]').find('select.region-child');
 
@@ -773,17 +879,21 @@
             saya.region_parent_name = parent_name;
             saya.region_name = child_name;
 
-            if (!parent.length || !child.length) {
+            if (!parent || !child) {
 
                 return false;
             }
 
-            localforage.setItem('region_submit', {
+            var region_submit = {
                 parent: parent,
                 child: child,
                 parent_name: parent_name,
                 child_name: child_name,
-            });
+            };
+
+            console.log('localforage.region_submit is setting ...');
+            console.log(region_submit);
+            localforage.setItem('region_submit', region_submit);
         });
 
         // xử lý khi xóa item trong giỏ hàng
@@ -872,6 +982,17 @@
             return false;
         });
 
+        // thực hiện xóa bỏ set timeout khi popup bị tắt giữa chừng
+        $('#system-popup').on('popupafterclose', function (event, ui) {
+
+            console.log('#system-popup popupafterclose event was trigger');
+            if (saya.openSystemPopupTimeout) {
+
+                console.log('clearTimeout saya.openSystemPopupTimeout');
+                clearTimeout(saya.openSystemPopupTimeout);
+            }
+        });
+
         $(document).on("pagecontainerbeforeshow", function (event, ui) {
 
             console.log('document: pagecontainerbeforeshow trigger');
@@ -881,16 +1002,19 @@
 
             if (page_id == 'region-page') {
 
-                var $region_parent = $toPage.find('select.region-parent');
-                console.log('region-page: render data from localforage.settings');
-                localforage.getItem('settings', function (err, value) {
+                saya.settingPromise.done(function () {
 
-                    var region_parent = value.regions.parent;
-                    var opts = '<option value="">Tỉnh/Thành phố</option>';
-                    opts += saya.helper.renderOpts(region_parent);
-                    $region_parent.html(opts);
-                    $region_parent.selectmenu("refresh");
-                    $region_parent.trigger('change');
+                    var $region_parent = $toPage.find('select.region-parent');
+                    console.log('region-page: render data from localforage.settings');
+                    localforage.getItem('settings', function (err, value) {
+
+                        var region_parent = value.regions.parent;
+                        var opts = '<option value="">Tỉnh/Thành phố</option>';
+                        opts += saya.helper.renderOpts(region_parent);
+                        $region_parent.html(opts);
+                        $region_parent.selectmenu("refresh");
+                        $region_parent.trigger('change');
+                    });
                 });
             } else if (page_id == 'region-edit-page') {
 
@@ -945,7 +1069,7 @@
                         $toPage.find('div[role="main"]').html(saya.settings.empty_product_in_region);
                         $toPage.trigger('create');
                     }
-              
+
                     $('body').spin(false);
                 });
             } else if (page_id == 'cart-page') {
@@ -1028,4 +1152,34 @@
     function onResume() {
         // TODO: This application has been reactivated. Restore application state here.
     };
-} )();
+
+    // khi kết nối mạng bị ngắt
+    function onOffline() {
+
+        console.log('Offline event was trigger');
+        if (saya.networkStatus !== 0) {
+
+            console.log('Change saya.networkStatus = 0 & open NetworkPopup');
+            saya.networkStatus = 0;
+            saya.openNetworkPopup(saya.settings.offline_network);
+        }
+    };
+
+    // khi kết nối mạng được khôi phục
+    function onOnline() {
+
+        console.log('Online event was trigger');
+        if (saya.networkStatus !== 1) {
+
+            console.log('Change saya.networkStatus = 1 & change HomePage');
+            saya.networkStatus = 1;
+            saya.changeHomePage();
+        }
+    };
+
+    function onBackKeyDown(event) {
+
+        console.log('backkeydown was trigger');
+        event.preventDefault();
+    };
+})();

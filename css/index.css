@@ -42,7 +42,7 @@ input {
 
 .slogan-top {
     margin: 0;
-    font-size: 60px;
+    font-size: 65px;
 }
 
     .slogan-top span.n {
@@ -84,13 +84,13 @@ input {
     .page-title span.e1 {
         font-family: VGEOMELG;
         color: yellow;
-        font-size: 1.2em;
+        font-size: 1em;
     }
 
     .page-title span.e2 {
         font-family: VGEOMELG;
         color: red;
-        font-size: 1.2em;
+        font-size: 1em;
     }
 
     .page-title span.d{
@@ -223,3 +223,4 @@ a.cart-item {
 .requied {
     color: #ecd9bb;
 }
+
