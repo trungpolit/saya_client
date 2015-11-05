@@ -14,11 +14,6 @@
     src: url('fonts/VGEOMELG.TTF') format('truetype');
 }
 
-@font-face {
-    font-family: 'COUR';
-    src: url('fonts/COUR.TTF') format('truetype');
-}
-
 * {
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -34,6 +29,10 @@ input {
     -moz-user-select: auto !important;
     -ms-user-select: auto !important;
     user-select: auto !important;
+}
+
+body {
+    overflow-x:hidden;  
 }
 
 .slogan {
