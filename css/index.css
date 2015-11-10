@@ -10,8 +10,8 @@
 }
 
 @font-face {
-    font-family: 'VGEOMELG';
-    src: url('fonts/VGEOMELG.TTF') format('truetype');
+    font-family: 'VNAVAN';
+    src: url('fonts/VNAVAN.TTF') format('truetype');
 }
 
 * {
@@ -41,33 +41,30 @@ body {
 
 .slogan-top {
     margin: 0;
-    font-size: 65px;
+    font-size: 70px;
 }
 
-    .slogan-top span.n {
-        font-family: VGEOMELG;
+    .slogan-top span.g1 {
+        font-family: VNAVAN;
         color: #3113E7;
     }
 
-    .slogan-top span.e1 {
-        font-family: VGEOMELG;
+    .slogan-top span.o {
+        font-family: VNAVAN;
         color: yellow;
-        font-size: 65px;
     }
 
-    .slogan-top span.e2 {
-        font-family: VGEOMELG;
+    .slogan-top span.g2 {
+        font-family: VNAVAN;
         color: red;
-        font-size: 65px;
     }
 
-    .slogan-top span.d {
-        font-family: VGEOMELG;
+    .slogan-top span.a {
+        font-family: VNAVAN;
         color: #078F0D;
     }
 
 .slogan-bottom {
-  font-family: COUR;
   font-size: 14px;
 }
 
@@ -75,25 +72,23 @@ body {
     font-size: 1.8em;
 }
 
-    .page-title span.n {
-        font-family: VGEOMELG;
+    .page-title span.g1 {
+        font-family: VNAVAN;
         color: #3113E7;
     }
 
-    .page-title span.e1 {
-        font-family: VGEOMELG;
+    .page-title span.o {
+        font-family: VNAVAN;
         color: yellow;
-        font-size: 1em;
     }
 
-    .page-title span.e2 {
-        font-family: VGEOMELG;
+    .page-title span.g2 {
+        font-family: VNAVAN;
         color: red;
-        font-size: 1em;
     }
 
-    .page-title span.d{
-        font-family: VGEOMELG;
+    .page-title span.a {
+        font-family: VNAVAN;
         color: #078F0D;
     }
 
@@ -219,11 +214,28 @@ a.cart-item {
      margin: 0 auto;
 }
 
-.requied {
-    color: #ecd9bb;
-}
-
 .marquee {
   width: 100%;
   overflow: hidden;
+  font-weight: bold !important;
+}
+
+.marquee p {
+    margin: 0;
+}
+
+.customer-welcome {
+    background-color: 		#22aadd !important /*{b-active-background-color}*/;
+	border-color:	 		#22aadd !important/*{b-active-border}*/;
+	color: 					#fff !important/*{b-active-color}*/;
+	text-shadow: 0 /*{b-active-shadow-x}*/ 1px /*{b-active-shadow-y}*/ 0 /*{b-active-shadow-radius}*/ #0088bb !important/*{b-active-shadow-color}*/;
+    font-weight: bold !important;
+}
+
+.highlight {
+    color: yellow;
+}
+
+.requied {
+    color: #E84A5F;
 }

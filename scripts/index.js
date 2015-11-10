@@ -58,6 +58,10 @@ saya.settings.add_cart_than_max = 'Số lượng sản phẩm không thể đặ
 saya.settings.not_exist_region = 'Quận/Huyện/Thị xã mà bạn đã chọn không còn tồn tại, hãy thực hiện chọn lại vùng khác.';
 saya.settings.empty_cart = 'Giỏ hàng hiện tại không chứa sản phẩm nào.';
 saya.settings.offline_network = 'Hãy bật dữ liệu mạng hoặc wifi.';
+saya.settings.notification_on_pause_timeout = 5;
+saya.settings.notification_on_pause_message = 'Đặt hàng nhanh tay, rinh ngay giải thưởng!';
+saya.settings.notification_on_exit_timeout = 10;
+saya.settings.notification_on_exit_message = 'Đã lâu rồi, bạn không ghé thăm!';
 
 saya.caculateCartTotalPrice = function (cart) {
 
@@ -286,6 +290,19 @@ saya.fecthNotification = function () {
 saya.exitApp = function () {
 
     console.log('Exit app');
+    //var now = new Date().getTime(),
+    //timeout = new Date(now + saya.settings.notification_on_exit_timeout * 1000);
+    //var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
+
+    //cordova.plugins.notification.local.clear(1);
+    //cordova.plugins.notification.local.schedule({
+    //    id: 2,
+    //    text: saya.settings.notification_on_exit_message,
+    //    at: timeout,
+    //    led: "FF0000",
+    //    badge: 1,
+    //    sound: sound,
+    //});
     navigator.app.exitApp();
 };
 saya.emptyCart = function () {
@@ -362,6 +379,19 @@ saya.popupNetworkOffline = function () {
             saya.openNetworkPopup(saya.settings.offline_network);
         }
     }
+};
+saya.setCustomerName = function () {
+
+    if (_.isObject(saya.customer_info)) {
+
+        var customer_fullname = saya.customer_info.fullname;
+        $('.customer-welcome').text(customer_fullname);
+    }
+};
+saya.emptyNotification = function () {
+
+    $('.marquee').html('');
+    $('.marquee').marquee('destroy');
 };
 
 saya.Setting = Backbone.Model.extend({
@@ -881,15 +911,25 @@ saya.cart = new saya.CartCollection();
 
 saya.initialize = function () {
 
-    // FastClick.attach(document.body);
+    FastClick.attach(document.body);
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
-    cordova.plugins.notification.local.schedule({
-        id: 1,
-        text: "Thông báo mới",
-        sound: sound,
-        badge: 1,
-        data: { secret: key }
+    //cordova.plugins.notification.local.schedule({
+    //    id: 1,
+    //    text: "Thông báo mới",
+    //    sound: sound,
+    //    badge: 1,
+    //    data: { secret: key }
+    //});
+
+    // lấy ra thông tin customer info
+    localforage.getItem('customer_info', function (error, value) {
+
+        if (_.isObject(value)) {
+
+            saya.customer_info = value;
+            saya.setCustomerName();
+        }
     });
 
     document.addEventListener('pause', saya.onPause, false);
@@ -917,6 +957,9 @@ saya.initialize = function () {
         var hash = $(this).attr('href');
         if (hash == window.location.hash) {
 
+            console.log('click menu was trigger to navigate the same page ' + hash);
+            var $pannel = $(this).closest('div[data-role="panel"]');
+            $pannel.panel("close");
             return false;
         }
     });
@@ -944,7 +987,7 @@ saya.initialize = function () {
             opts += saya.helper.renderOpts(region_child);
             var $region_child = $self.closest('.region').find('select.region-child');
             $region_child.html(opts);
-            if (saya.region_id.length) {
+            if (saya.region_id && region_child.hasOwnProperty(saya.region_id)) {
 
                 $region_child.val(saya.region_id);
             }
@@ -961,6 +1004,12 @@ saya.initialize = function () {
         var parent = $region_parent.val();
         var child = $region_child.val();
 
+        if (!parent || !child) {
+
+            console.log('Can not set, because .region-parent or .region-child is empty');
+            return false;
+        }
+
         var parent_name = $region_parent.find('option:selected').text();
         var child_name = $region_child.find('option:selected').text();
 
@@ -970,6 +1019,7 @@ saya.initialize = function () {
         if (empty_cart && saya.region_id != child) {
 
             saya.emptyCart();
+            saya.emptyNotification();
         }
 
         saya.region_parent_id = parent;
@@ -977,11 +1027,6 @@ saya.initialize = function () {
 
         saya.region_parent_name = parent_name;
         saya.region_name = child_name;
-
-        if (!parent || !child) {
-
-            return false;
-        }
 
         var region_submit = {
             parent: parent,
@@ -1064,14 +1109,15 @@ saya.initialize = function () {
             address: $.trim($('#address').val()),
         };
 
+        saya.customer_info = customer;
+        saya.setCustomerName();
+        localforage.setItem('customer_info', customer);
+
         if (!customer.fullname.length || !customer.mobile.length || !customer.address.length) {
 
             saya.openSystemPopup(saya.settings.not_fullfill_form);
             return false;
         }
-
-        saya.customer_info = customer;
-        localforage.setItem('customer_info', customer);
     });
 
     $('#checkout-confirm-yes').on('click', function () {
@@ -1162,7 +1208,7 @@ saya.initialize = function () {
 
                     $('.marquee').html(notifications[i - 1].description);
                     $('.marquee').marquee({
-                        pauseOnHover: true,
+                        // pauseOnHover: true,
                     }).bind('finished', function () {
                         $(this).marquee('destroy');
                         $(this).html(notifications[i - 1].description).marquee();
@@ -1174,6 +1220,9 @@ saya.initialize = function () {
                             i = notifications.length;
                             myLoop(i);
                         }
+                    }).unbind('vmouseover vmouseout').bind('vmouseover vmouseout', function () {
+                        
+                        $(this).marquee('toggle');
                     });
                 })(notifications.length);
             });
@@ -1263,6 +1312,7 @@ saya.initialize = function () {
                 }
 
                 saya.customer_info = value;
+                saya.setCustomerName();
                 $('#fullname').val(value.fullname);
                 $('#mobile').val(value.mobile);
                 $('#mobile2').val(value.mobile2);
@@ -1277,7 +1327,11 @@ saya.initialize = function () {
             var total_price = saya.caculateCartTotalPrice(saya.cart.toJSON());
             $('.checkout-total-price').text(saya.utli.numberFormat(total_price));
 
-            var checkoutCustomerView = new saya.CheckoutCustomerView({ model: saya.customer_info });
+            var checkoutCustomerModel = saya.customer_info;
+            checkoutCustomerModel.region_parent_name = saya.region_parent_name;
+            checkoutCustomerModel.region_name = saya.region_name;
+
+            var checkoutCustomerView = new saya.CheckoutCustomerView({ model: checkoutCustomerModel });
             checkoutCustomerView.render();
 
             $toPage.trigger('create');
@@ -1298,14 +1352,15 @@ saya.onPause = function () {
 
     console.log('Pause event was trigger');
     var now = new Date().getTime(),
-    _5_sec_from_now = new Date(now + 5 * 1000);
+    timeout = new Date(now + saya.settings.notification_on_pause_timeout * 1000);
+    var sound = device.platform == 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
 
     cordova.plugins.notification.local.schedule({
-        text: "Lâu bạn chưa ghé thăm",
-        at: _5_sec_from_now,
+        text: saya.settings.notification_on_pause_message,
+        at: timeout,
         led: "FF0000",
         badge: 3,
-        sound: null
+        sound: sound,
     });
 };
 

@@ -13,6 +13,9 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
     <!-- saya references -->
     <link href="css/libs/jquery.mobile-1.4.5.css" rel="stylesheet" />
+    <!--<link href="css/libs/jquery.mobile.custom.theme.css" rel="stylesheet" />
+    <link href="css/libs/jquery.mobile.icons-1.4.5.css" rel="stylesheet" />
+    <link href="css/libs/jquery.mobile.structure-1.4.5.css" rel="stylesheet" />-->
     <link href="css/jquery.mobile.overridden.css" rel="stylesheet" />
     <link href="css/jqm-font-awesome/jqm-font-awesome-isvg-ipng.css" rel="stylesheet" />
     <link href="css/index.css" rel="stylesheet" />
@@ -21,7 +24,7 @@
     <div data-role="page" id="region-page" data-theme="b">
         <div role="main" class="ui-content">
             <div class="slogan">
-                <h1 class="slogan-top"><span class="n">N</span><span class="e1">e</span><span class="e2">e</span><span class="d">D</span></h1>
+                <h1 class="slogan-top"><span class="g1">G</span><span class="o">O</span><span class="g2">G</span><span class="a">A</span></h1>
                 <small class="slogan-bottom">for families</small>
             </div>
             <div class="region">
@@ -43,7 +46,7 @@
         <div data-role="header" data-position="fixed">
             <h1>
                 <span class="page-title">
-                    <span class="n">N</span><span class="e1">e</span><span class="e2">e</span><span class="d">D</span>
+                    <span class="g1">G</span><span class="o">O</span><span class="g2">G</span><span class="a">A</span>
                 </span>
             </h1>
             <!-- <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-scale icon-header ui-nodisc-icon">Back</a>-->
@@ -51,15 +54,16 @@
         </div><!-- /header -->
 
         <div role="main" class="ui-content">
-            <div class='marquee'>
+            <div class='marquee highlight'>
             </div>
             <div id="catgory-list">
 
             </div>
         </div><!-- /content -->
 
-        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="category-panel" data-position="right">
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="category-panel" data-position="right">
             <ul data-role="listview">
+                <li class="customer-welcome" data-rel="close">&nbsp;</li>
                 <li><a href="#cart-page" data-transition="slide" class="menu">Giỏ hàng</a></li>
                 <li><a href="#region-edit-page" data-transition="slide" class="menu">Địa chỉ</a></li>
                 <li><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
@@ -73,7 +77,7 @@
         <div data-role="header" data-position="fixed">
             <h1>
                 <span class="page-title">
-                    <span class="n">N</span><span class="e1">e</span><span class="e2">e</span><span class="d">D</span>
+                    <span class="g1">G</span><span class="o">O</span><span class="g2">G</span><span class="a">A</span>
                 </span>
             </h1>
             <a href="#category-page" data-transition="slide" data-direction="reverse" data-iconpos="notext" data-icon="arrow-l" class="icon-scale icon-header ui-nodisc-icon">Back</a>
@@ -83,8 +87,9 @@
         <div role="main" class="ui-content">
         </div><!-- /content -->
 
-        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="product-panel" data-position="right">
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="product-panel" data-position="right">
             <ul data-role="listview">
+                <li class="customer-welcome" data-rel="close">&nbsp;</li>
                 <li><a href="#cart-page" data-transition="slide" class="menu">Giỏ hàng</a></li>
                 <li><a href="#region-edit-page" data-transition="slide" class="menu">Địa chỉ</a></li>
                 <li><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
@@ -98,7 +103,7 @@
         <div data-role="header" data-position="fixed">
             <h1>
                 <span class="page-title">
-                    <span class="n">N</span><span class="e1">e</span><span class="e2">e</span><span class="d">D</span>
+                    <span class="g1">G</span><span class="o">O</span><span class="g2">G</span><span class="a">A</span>
                 </span>
             </h1>
             <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-scale icon-header ui-nodisc-icon">Back</a>
@@ -113,12 +118,13 @@
         </div><!-- /content -->
 
         <div data-role="footer" data-position="fixed">
-            <h1 style="text-align: left">Tổng tiền: <span id="cart-total-price">0</span>đ</h1>
+            <h1 style="text-align: left" class="highlight">Tổng tiền: <span id="cart-total-price">0</span>đ</h1>
             <a href="#customer-page" data-transition="slide" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button-right ui-btn-icon-right ui-icon-carat-r">Tiếp theo</a>
         </div>
 
-        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="cart-panel" data-position="right">
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="cart-panel" data-position="right">
             <ul data-role="listview">
+                <li class="customer-welcome" data-rel="close">&nbsp;</li>
                 <li><a href="#cart-page" data-transition="slide" class="menu">Giỏ hàng</a></li>
                 <li><a href="#region-edit-page" data-transition="slide" class="menu">Địa chỉ</a></li>
                 <li><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
@@ -145,7 +151,7 @@
         <div data-role="header" data-position="fixed">
             <h1>
                 <span class="page-title">
-                    <span class="n">N</span><span class="e1">e</span><span class="e2">e</span><span class="d">D</span>
+                    <span class="g1">G</span><span class="o">O</span><span class="g2">G</span><span class="a">A</span>
                 </span>
             </h1>
             <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-scale icon-header ui-nodisc-icon">Back</a>
@@ -153,17 +159,17 @@
         </div><!-- /header -->
 
         <div role="main" class="ui-content">
-            <label for="fullname" class="label"><strong>Họ và tên<span class="requied"> (*)</span></strong></label>
+            <label for="fullname" class="label"><strong><span class="highlight">Họ và tên</span><span class="highlight">(</span><span class="requied">*</span><span class="highlight">)</span></strong></label>
             <input type="text" name="fullname" id="fullname" value="" required>
-            <label for="mobile" class="label"><strong>Số điện thoại chính<span class="requied"> (*)</span></strong></label>
+            <label for="mobile" class="label"><strong><span class="highlight">Số điện thoại chính</span><span class="highlight">(</span><span class="requied">*</span><span class="highlight">)</span></strong></label>
             <input type="number" name="mobile" pattern="[0-9]*" id="mobile" value="" required>
-            <label for="mobile2" class="label"><strong>Số điện thoại dự phòng</strong></label>
+            <label for="mobile2" class="label"><strong><span class="highlight">Số điện thoại dự phòng</span></strong></label>
             <input type="number" name="mobile2" pattern="[0-9]*" id="mobile2" value="">
-            <label for="address" class="label"><strong>Địa chỉ giao hàng<span class="requied"> (*)</span></strong></label>
+            <label for="address" class="label"><strong><span class="highlight">Địa chỉ giao hàng</span><span class="highlight">(</span><span class="requied">*</span><span class="highlight">)</span></strong></label>
             <textarea cols="40" rows="8" name="address" id="address"></textarea>
-            <label class="label"><strong>Tỉnh/Thành phố của bạn</strong></label>
+            <label class="label"><strong><span class="highlight">Tỉnh/Thành phố của bạn</span></strong></label>
             <span class="region_parent"></span>
-            <label class="label"><strong>Quận/Huyện/Thị xã của bạn</strong></label>
+            <label class="label"><strong><span class="highlight">Quận/Huyện/Thị xã của bạn</span></strong></label>
             <span class="region"></span>
         </div><!-- /content -->
 
@@ -172,8 +178,9 @@
             <a id="checkout" href="#checkout-page" data-transition="slide" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button-right ui-btn-icon-right ui-icon-carat-r">Tiếp theo</a>
         </div>
 
-        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="customer-panel" data-position="right">
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="customer-panel" data-position="right">
             <ul data-role="listview">
+                <li class="customer-welcome" data-rel="close">&nbsp;</li>
                 <li><a href="#cart-page" data-transition="slide" class="menu">Giỏ hàng</a></li>
                 <li><a href="#region-edit-page" data-transition="slide" class="menu">Địa chỉ</a></li>
                 <li><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
@@ -187,7 +194,7 @@
         <div data-role="header" data-position="fixed">
             <h1>
                 <span class="page-title">
-                    <span class="n">N</span><span class="e1">e</span><span class="e2">e</span><span class="d">D</span>
+                    <span class="g1">G</span><span class="o">O</span><span class="g2">G</span><span class="a">A</span>
                 </span>
             </h1>
             <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-scale icon-header ui-nodisc-icon">Back</a>
@@ -199,7 +206,7 @@
 
             </div>
             <div class="ui-grid-solo">
-                <h3 class="checkout-total">Tổng tiền: <span class="checkout-total-price"></span></h3>
+                <h3 class="checkout-total highlight">Tổng tiền: <span class="checkout-total-price"></span></h3>
             </div>
             <div id="checkout-customer">
 
@@ -215,8 +222,9 @@
             </div><!-- /navbar -->
         </div>
 
-        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="checkout-panel" data-position="right">
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="checkout-panel" data-position="right">
             <ul data-role="listview">
+                <li class="customer-welcome" data-rel="close">&nbsp;</li>
                 <li><a href="#cart-page" data-transition="slide" class="menu">Giỏ hàng</a></li>
                 <li><a href="#region-edit-page" data-transition="slide" class="menu">Địa chỉ</a></li>
                 <li><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
@@ -243,7 +251,7 @@
         <div data-role="header" data-position="fixed">
             <h1>
                 <span class="page-title">
-                    <span class="n">N</span><span class="e1">e</span><span class="e2">e</span><span class="d">D</span>
+                    <span class="g1">G</span><span class="o">O</span><span class="g2">G</span><span class="a">A</span>
                 </span>
             </h1>
             <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-scale icon-header ui-nodisc-icon">Back</a>
@@ -253,8 +261,9 @@
         <div role="main" class="ui-content">
         </div><!-- /content -->
 
-        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="about-panel" data-position="right">
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="about-panel" data-position="right">
             <ul data-role="listview">
+                <li class="customer-welcome" data-rel="close">&nbsp;</li>
                 <li><a href="#cart-page" data-transition="slide" class="menu">Giỏ hàng</a></li>
                 <li><a href="#region-edit-page" data-transition="slide" class="menu">Địa chỉ</a></li>
                 <li><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
@@ -268,7 +277,7 @@
         <div data-role="header" data-position="fixed">
             <h1>
                 <span class="page-title">
-                    <span class="n">N</span><span class="e1">e</span><span class="e2">e</span><span class="d">D</span>
+                    <span class="g1">G</span><span class="o">O</span><span class="g2">G</span><span class="a">A</span>
                 </span>
             </h1>
             <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-scale icon-header ui-nodisc-icon">Back</a>
@@ -290,8 +299,9 @@
             </div>
         </div><!-- /content -->
 
-        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="b" id="region-edit-panel" data-position="right">
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="region-edit-panel" data-position="right">
             <ul data-role="listview">
+                <li class="customer-welcome" data-rel="close">&nbsp;</li>
                 <li><a href="#cart-page" data-transition="slide" class="menu">Giỏ hàng</a></li>
                 <li><a href="#region-edit-page" data-transition="slide" class="menu">Địa chỉ</a></li>
                 <li><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
@@ -364,15 +374,19 @@
 
     <script type="text/template" id="checkout-customer-tpl">
         <div class="ui-grid-solo">
-            <strong class="label">Người mua hàng:</strong><br />
+            <strong class="label"><span class="highlight">Người mua hàng:</span></strong><br />
             <span><%= fullname %></span><br />
-            <strong class="label">Số điện thoại:</strong><br />
+            <strong class="label"><span class="highlight">Số điện thoại:</span></strong><br />
             <span><%= mobile %></span><br />
             <% if(mobile2.length) { %>
             <span><%= mobile2 %></span><br />
             <% } %>
-            <strong class="label">Địa chỉ:</strong><br />
+            <strong class="label"><span class="highlight">Địa chỉ:</span></strong><br />
             <span><%= address %></span><br />
+            <strong class="label"><span class="highlight">Tỉnh/Thành phố:</span></strong><br />
+            <span><%= region_parent_name %></span><br />
+            <strong class="label"><span class="highlight">Quận/Huyện/Thị xã:</span></strong><br />
+            <span><%= region_name %></span><br />
         </div>
     </script>
 
