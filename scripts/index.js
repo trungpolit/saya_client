@@ -58,10 +58,14 @@ saya.settings.add_cart_than_max = 'Số lượng sản phẩm không thể đặ
 saya.settings.not_exist_region = 'Quận/Huyện/Thị xã mà bạn đã chọn không còn tồn tại, hãy thực hiện chọn lại vùng khác.';
 saya.settings.empty_cart = 'Giỏ hàng hiện tại không chứa sản phẩm nào.';
 saya.settings.offline_network = 'Hãy bật dữ liệu mạng hoặc wifi.';
-saya.settings.notification_on_pause_timeout = 5;
+saya.settings.notification_on_pause_timeout = 300000;
 saya.settings.notification_on_pause_message = 'Đặt hàng nhanh tay, rinh ngay giải thưởng!';
-saya.settings.notification_on_exit_timeout = 10;
+saya.settings.notification_on_exit_timeout = 300000;
 saya.settings.notification_on_exit_message = 'Đã lâu rồi, bạn không ghé thăm!';
+saya.settings.share_message = 'Ứng dụng hay tải ngay, nhận ngay ưu đãi!';
+saya.settings.share_subject = 'Tải ngay ứng dụng GOGA';
+saya.settings.share_link = 'https://goo.gl/E5G9tL';
+saya.settings.share_image = null;
 
 saya.caculateCartTotalPrice = function (cart) {
 
@@ -542,7 +546,7 @@ saya.ProductListView = Backbone.View.extend({
 
         // $.mobile.silentScroll(offset.top);
 
-        $product_expand.trigger('click');
+        $product_expand.find('a.product-item').trigger('click');
     },
 });
 
@@ -650,7 +654,7 @@ saya.ProductItemView = Backbone.View.extend({
     },
     events: {
         "click .cart": "onCartButtonClick",
-        "click": "onProductItemClick",
+        "click a.product-item": "onProductItemClick",
     },
     onProductItemClick: function (event) {
 
@@ -911,7 +915,7 @@ saya.cart = new saya.CartCollection();
 
 saya.initialize = function () {
 
-    FastClick.attach(document.body);
+    //FastClick.attach(document.body);
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
     //cordova.plugins.notification.local.schedule({
@@ -921,6 +925,11 @@ saya.initialize = function () {
     //    badge: 1,
     //    data: { secret: key }
     //});
+
+    $('body').on('click', '.ui-btn', function () {
+
+        navigator.vibrate(100);
+    });
 
     // lấy ra thông tin customer info
     localforage.getItem('customer_info', function (error, value) {
@@ -962,6 +971,16 @@ saya.initialize = function () {
             $pannel.panel("close");
             return false;
         }
+    });
+
+    $('a.share').on('click', function () {
+
+        if (window.plugins.socialsharing) {
+
+            window.plugins.socialsharing.share(saya.settings.share_message, saya.settings.share_subject, saya.settings.share_image, saya.settings.share_link);
+        }
+
+        return false;
     });
 
     $('select.region-parent').on('change', function () {
