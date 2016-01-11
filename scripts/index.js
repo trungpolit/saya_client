@@ -13,8 +13,8 @@
 "use strict";
 var saya = {};
 saya.config = {
-    serviceDomain: "http://saya-backend.16mb.com/saya_backend/",
-    //serviceDomain: "http://localhost/saya_backend/",
+    //serviceDomain: "http://saya-backend.16mb.com/saya_backend/",
+    serviceDomain: "http://localhost/saya_backend/",
     //serviceDomain: "http://192.168.5.115/saya_backend/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
@@ -34,6 +34,13 @@ saya.config = {
         path: 'notifications/',
         pattern: '{region_id}_{year_month}.json',
     },
+    serviceOrder: {
+        path: 'orders/',
+        pattern: '{customer_id}/{page}.json',
+    },
+    serviceOrderCreate: {
+        path: 'OrderServices/create',
+    },
 };
 // trạng thái của network
 saya.networkStatus = 1;
@@ -51,6 +58,7 @@ saya.customer_info = {};
 saya.product_expand = '';
 saya.cart_item_remove = {};
 
+// Thiết lập giá trị mặc định settings, các thiết lập này sẽ bị ghi đè khi khởi động app
 saya.settings = {};
 saya.settings.max_product_qty = 3;
 saya.settings.popup_timeout = 3;
@@ -66,6 +74,8 @@ saya.settings.share_message = 'Ứng dụng hay tải ngay, nhận ngay ưu đã
 saya.settings.share_subject = 'Tải ngay ứng dụng GOGA';
 saya.settings.share_link = 'https://goo.gl/E5G9tL';
 saya.settings.share_image = null;
+saya.settings.enable_vibrate = 1;
+saya.settings.vibrate_time = 100;
 
 saya.caculateCartTotalPrice = function (cart) {
 
@@ -84,11 +94,16 @@ saya.setCustomerId = function () {
 
     localforage.getItem('customer_id', function (err, value) {
 
-        if (!value) {
+        // if (!value) {
 
-            value = device.uuid | saya.utli.guid();
-            localforage.setItem('customer_id', value);
+        value = device.uuid | saya.utli.guid();
+        if (value == 0 || value == '') {
+
+            value = saya.utli.guid();
         }
+        console.log('set customer_id = ' + value);
+        localforage.setItem('customer_id', value);
+        //}
 
         saya.customer_id = value;
     });
@@ -293,20 +308,10 @@ saya.fecthNotification = function () {
 };
 saya.exitApp = function () {
 
-    console.log('Exit app');
-    //var now = new Date().getTime(),
-    //timeout = new Date(now + saya.settings.notification_on_exit_timeout * 1000);
-    //var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
+    console.log('Empty cart before exit app!');
+    saya.emptyCart();
 
-    //cordova.plugins.notification.local.clear(1);
-    //cordova.plugins.notification.local.schedule({
-    //    id: 2,
-    //    text: saya.settings.notification_on_exit_message,
-    //    at: timeout,
-    //    led: "FF0000",
-    //    badge: 1,
-    //    sound: sound,
-    //});
+    console.log('Exit app');
     navigator.app.exitApp();
 };
 saya.emptyCart = function () {
@@ -676,7 +681,6 @@ saya.ProductItemView = Backbone.View.extend({
     onCartButtonClick: function (event) {
 
         console.log('Tap on cart button was trigger');
-        event.stopPropagation();
         var $self = $(event.currentTarget);
         var item = $self.data('item');
         var thisView = this;
@@ -918,17 +922,31 @@ saya.initialize = function () {
     //FastClick.attach(document.body);
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
-    //cordova.plugins.notification.local.schedule({
-    //    id: 1,
-    //    text: "Thông báo mới",
-    //    sound: sound,
-    //    badge: 1,
-    //    data: { secret: key }
-    //});
 
+    // điều khiển bấm nút thì rung
     $('body').on('click', '.ui-btn', function () {
 
-        navigator.vibrate(100);
+        // nếu có bật chế độ rung
+        if (saya.settings.enable_vibrate) {
+
+            $('#enable-vibrate').prop('checked', true);
+            var vibrate_time = parseInt(saya.settings.vibrate_time);
+            navigator.vibrate(vibrate_time);
+        } else {
+
+            $('#enable-vibrate').prop('checked', false);
+        }
+    });
+
+    $('#enable-vibrate').on('change', function () {
+
+        if ($(this).prop('checked')) {
+
+            saya.settings.enable_vibrate = 1;
+        } else {
+
+            saya.settings.enable_vibrate = 0;
+        }
     });
 
     // lấy ra thông tin customer info
@@ -1113,12 +1131,75 @@ saya.initialize = function () {
         saya.cart_item_remove = {};
     });
 
+    // Khi thực hiện ấn vào nút "Đặt hàng"
     $('.checkout-ok').on('click', function () {
 
-        saya.openSystemPopup(saya.settings.checkout_success);
+        console.log('.checkout-ok was trigger click');
+        console.log('Customer info:');
+        console.log(saya.customer_info);
+        console.log('Cart info:');
+        var cart = saya.cart.toJSON();
+        console.log(cart);
+
+        // thực hiện parse lại cấu trúc data
+        var order = {};
+        order.customer = {
+            code: saya.customer_id,
+            name: saya.customer_info.fullname,
+            mobile: saya.customer_info.mobile,
+            mobile2: saya.customer_info.mobile2,
+            address: saya.customer_info.address,
+        };
+        order.region_id = saya.region_id;
+        order.region_name = saya.region_name;
+        order.platform_os = device.platform;
+        order.platform_version = device.version;
+
+        // thực hiện parse lại cấu trúc cart
+        order.cart = [];
+        _.each(cart, function (item, index) {
+
+            order.cart.push({
+                id: item.id,
+                qty:item.qty,
+            });
+        });
+
+        var order_json = JSON.stringify(order);
+        console.log('order_json:');
+        console.log(order_json);
+        console.log('Order info:');
+        console.log(order);
+
+        // thực hiện request lên server
+        var order_create = saya.config.serviceDomain + saya.config.serviceOrderCreate.path;
+        console.log('order_create = ' + order_create);
+        var req = $.get(order_create, { order:order_json}, function (data) {
+
+            if (data.status == 'success') {
+
+                console.log('create the order successful.');
+                console.log('Order info:');
+                console.log(data);
+            } else {
+
+                console.log('create the order fail.');
+                console.log('Error info:');
+                console.log(data);
+            }
+
+        }, 'json');
+
+        req.fail(function (jqXHR, textStatus, errorThrown) {
+
+            console.log('Request to create the order was error.');
+        });
+
+        // saya.openSystemPopup(saya.settings.checkout_success);
         return false;
     });
 
+    // Khi thực hiện ấn nút "Tiếp theo" trong #cart-page để tới màn hình thanh toán
     $('#checkout').on('click', function () {
 
         var customer = {
@@ -1129,7 +1210,9 @@ saya.initialize = function () {
         };
 
         saya.customer_info = customer;
+        // Thực hiện thiết lập tên người đặt hàng ở tiêu đề thanh menu
         saya.setCustomerName();
+
         localforage.setItem('customer_info', customer);
 
         if (!customer.fullname.length || !customer.mobile.length || !customer.address.length) {
@@ -1240,7 +1323,7 @@ saya.initialize = function () {
                             myLoop(i);
                         }
                     }).unbind('vmouseover vmouseout').bind('vmouseover vmouseout', function () {
-                        
+
                         $(this).marquee('toggle');
                     });
                 })(notifications.length);

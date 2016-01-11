@@ -7,8 +7,7 @@
         Customize the content security policy in the meta tag below as needed. Add 'unsafe-inline' to default-src to enable inline JavaScript.
         For details, see http://go.microsoft.com/fwlink/?LinkID=617521
     -->
-    <meta http-equiv="Content-Security-Policy"
-          content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: https://ssl.gstatic.com 'unsafe-eval'; script-src * 'self' 'unsafe-inline' 'unsafe-eval' ;style-src * 'self' 'unsafe-inline' 'unsafe-eval'; media-src *">
+    <meta http-equiv="Content-Security-Policy" />
     <title>saya</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
     <!-- saya references -->
@@ -22,11 +21,14 @@
 </head>
 <body>
     <div data-role="page" id="region-page" data-theme="a">
+        <div data-role="header" data-position="fixed">
+            <h1>
+                <span class="page-title">
+                    <span class="g1">G</span><span class="o">o</span><span class="g2">G</span><span class="a">a</span>
+                </span>
+            </h1> 
+        </div>
         <div role="main" class="ui-content">
-            <div class="slogan">
-                <h1 class="slogan-top"><span class="g1">G</span><span class="o">o</span><span class="g2">G</span><span class="a">a</span></h1>
-                <span class="slogan-bottom">là niềm tin</span>
-            </div>
             <div class="region">
                 <select class="region-parent" name="region[parent]">
                     <option value="">Thành phố/Tỉnh</option>
@@ -68,6 +70,7 @@
                 <li><a href="#region-edit-page" data-transition="slide" class="menu">Địa chỉ</a></li>
                 <li><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
                 <li><a href="#about-page" data-transition="slide" class="menu">Giới thiệu</a></li>
+                <li><a href="#setting-page" data-transition="slide" class="menu">Cài đặt</a></li>
                 <li><a href="#exit-app" class="exit-app">Thoát</a></li>
             </ul>
         </div>
@@ -80,7 +83,7 @@
                     <span class="g1">G</span><span class="o">o</span><span class="g2">G</span><span class="a">a</span>
                 </span>
             </h1>
-            <a href="#category-page" data-transition="slide" data-direction="reverse" data-iconpos="notext" data-icon="arrow-l" class="icon-zoom">Back</a>
+            <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-zoom">Back</a>
             <a href="#product-panel" data-icon="grid" data-iconpos="notext" class="icon-zoom">Menu</a>
         </div><!-- /header -->
 
@@ -140,8 +143,8 @@
             <div role="main" class="ui-content">
                 <p>Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?</p>
                 <div class="button-center">
-                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="cart-confirm-ok">Đồng ý</a>
-                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="cart-confirm-cancel">Hủy bỏ</a>
+                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="cart-confirm-ok">&nbsp;&nbsp;&nbsp;Có&nbsp;&nbsp;&nbsp;</a>
+                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="cart-confirm-cancel">Không</a>
                 </div>
             </div>
         </div>
@@ -159,17 +162,17 @@
         </div><!-- /header -->
 
         <div role="main" class="ui-content">
-            <label for="fullname" class="label"><strong><span class="highlight">Họ và tên</span><span class="requied">(</span><span class="requied">*</span><span class="requied">)</span></strong></label>
+            <label for="fullname" class="label"><strong><span>Họ và tên</span><span class="requied">(</span><span class="requied">*</span><span class="requied">)</span></strong></label>
             <input type="text" name="fullname" id="fullname" value="" required>
-            <label for="mobile" class="label"><strong><span class="highlight">Số điện thoại chính</span><span class="requied">(</span><span class="requied">*</span><span class="requied">)</span></strong></label>
+            <label for="mobile" class="label"><strong><span>Số điện thoại chính</span><span class="requied">(</span><span class="requied">*</span><span class="requied">)</span></strong></label>
             <input type="number" name="mobile" pattern="[0-9]*" id="mobile" value="" required>
-            <label for="mobile2" class="label"><strong><span class="highlight">Số điện thoại dự phòng</span></strong></label>
+            <label for="mobile2" class="label"><strong><span>Số điện thoại dự phòng</span></strong></label>
             <input type="number" name="mobile2" pattern="[0-9]*" id="mobile2" value="">
-            <label for="address" class="label"><strong><span class="highlight">Địa chỉ giao hàng</span><span class="requied">(</span><span class="requied">*</span><span class="requied">)</span></strong></label>
+            <label for="address" class="label"><strong><span>Địa chỉ giao hàng</span><span class="requied">(</span><span class="requied">*</span><span class="requied">)</span></strong></label>
             <textarea cols="40" rows="8" name="address" id="address"></textarea>
-            <label class="label"><strong><span class="highlight">Tỉnh/Thành phố của bạn</span></strong></label>
+            <label class="label"><strong><span>Tỉnh/Thành phố của bạn</span></strong></label>
             <span class="region_parent"></span>
-            <label class="label"><strong><span class="highlight">Quận/Huyện/Thị xã của bạn</span></strong></label>
+            <label class="label"><strong><span>Quận/Huyện/Thị xã của bạn</span></strong></label>
             <span class="region"></span>
         </div><!-- /content -->
 
@@ -240,8 +243,8 @@
             <div role="main" class="ui-content">
                 <p>Bạn muốn hủy đơn hàng này?</p>
                 <div class="button-center">
-                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="checkout-confirm-no">Không</a>
                     <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="checkout-confirm-yes">&nbsp;&nbsp;&nbsp;Có&nbsp;&nbsp;&nbsp;</a>
+                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="checkout-confirm-no">Không</a>
                 </div>
             </div>
         </div>
@@ -362,6 +365,47 @@
                 <li><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
                 <li><a href="#about-page" data-transition="slide" class="menu">Giới thiệu</a></li>
                 <li><a href="#exit-app" class="exit-app">Thoát</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div data-role="page" id="setting-page" data-theme="a">
+        <div data-role="header" data-position="fixed">
+            <h1>
+                <span class="page-title">
+                    <span class="g1">G</span><span class="o">o</span><span class="g2">G</span><span class="a">a</span>
+                </span>
+            </h1>
+            <a href="#category-page" data-transition="slide" data-direction="reverse" data-iconpos="notext" data-icon="arrow-l" class="icon-zoom">Back</a>
+            <a href="#setting-panel" data-icon="grid" data-iconpos="notext" class="icon-zoom">Menu</a>
+        </div>
+
+        <div role="main" class="ui-content">
+            <form>
+                <label for="enable-vibrate"><strong>Bật/tắt chế độ rung:</strong></label>
+                <input type="checkbox" data-role="flipswitch" name="enable-vibrate" id="enable-vibrate" data-on-text="Bật" data-off-text="Tắt" data-wrapper-class="custom-label-flipswitch">
+            </form>
+        </div>
+
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="setting-panel" data-position="right">
+            <ul data-role="listview">
+                <li class="customer-welcome" data-rel="close">&nbsp;</li>
+                <li><a href="#cart-page" data-transition="slide" class="menu">Giỏ hàng</a></li>
+                <li><a href="#region-edit-page" data-transition="slide" class="menu">Địa chỉ</a></li>
+                <li><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
+                <li><a href="#about-page" data-transition="slide" class="menu">Giới thiệu</a></li>
+                <li><a href="#setting-page" data-transition="slide" class="menu">Cài đặt</a></li>
+                <li><a href="#exit-app" class="exit-app">Thoát</a></li>
+                <li class="slogan">
+                    <div style="text-align:center">
+                        <h1>
+                            <span class="slogan-top">
+                                <span class="g1">G</span><span class="o">o</span><span class="g2">G</span><span class="a">a</span>
+                            </span>
+                        </h1>
+                        <span class="slogan-bottom">là niềm tin</span>
+                    </div>
+                </li>
             </ul>
         </div>
     </div>
