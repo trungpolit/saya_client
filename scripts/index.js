@@ -35,11 +35,15 @@ saya.config = {
         pattern: '{region_id}_{year_month}.json',
     },
     serviceOrder: {
-        path: 'orders/',
+        path: 'orders_bundles/',
         pattern: '{customer_id}/{page}.json',
     },
     serviceOrderCreate: {
         path: 'OrderServices/create',
+    },
+    serviceCustomerDetail: {
+        path: 'customers/',
+        pattern: '{customer_id}.json',
     },
 };
 // trạng thái của network
@@ -57,6 +61,12 @@ saya.customer_id = '';
 saya.customer_info = {};
 saya.product_expand = '';
 saya.cart_item_remove = {};
+saya.total_order = 0;
+saya.total_order_bundle = 0;
+saya.order_page_limit = 5;
+saya.order_page = 0;
+saya.order_bundle_page = 0;
+saya.order_page_load = 0;
 
 // Thiết lập giá trị mặc định settings, các thiết lập này sẽ bị ghi đè khi khởi động app
 saya.settings = {};
@@ -76,6 +86,11 @@ saya.settings.share_link = 'https://goo.gl/E5G9tL';
 saya.settings.share_image = null;
 saya.settings.enable_vibrate = 1;
 saya.settings.vibrate_time = 100;
+saya.settings.order_status = { "0": "Thất bại", "1": "Thành công", "2": "Đang xử lý", "3": "Đã hủy", "4": "Cảnh cáo" };
+saya.settings.order_status_unknown = 'Không xác định';
+saya.settings.order_status_class = { "0": "order-status-warning", "1": "order-status-success", "2": "order-status-pending", "3": "order-status-info", "4": "order-status-danger" };
+saya.settings.order_status_class_unknown = 'order-status-unknown';
+saya.settings.order_empty = 'Hiện tại, bạn chưa đặt bất cứ đơn hàng nào cả.';
 
 saya.caculateCartTotalPrice = function (cart) {
 
@@ -94,18 +109,21 @@ saya.setCustomerId = function () {
 
     localforage.getItem('customer_id', function (err, value) {
 
-        // if (!value) {
+        if (!value) {
 
-        value = device.uuid | saya.utli.guid();
-        if (value == 0 || value == '') {
+            value = device.uuid | saya.utli.guid();
+            if (value == 0 || value == '') {
 
-            value = saya.utli.guid();
+                value = saya.utli.guid();
+            }
+            console.log('set customer_id = ' + value);
+            localforage.setItem('customer_id', value);
         }
-        console.log('set customer_id = ' + value);
-        localforage.setItem('customer_id', value);
-        //}
 
         saya.customer_id = value;
+
+        // lấy thông tin về customer
+        saya.fecthCustomerDetail();
     });
 };
 saya.openSystemPopup = function (message, timeout) {
@@ -306,6 +324,41 @@ saya.fecthNotification = function () {
 
     return deferred.promise();
 };
+saya.fecthCustomerDetail = function () {
+
+    if (!saya.customer_id.length) {
+
+        return;
+    }
+
+    var url = saya.config.serviceDomain + saya.config.serviceRoot + saya.config.serviceCustomerDetail.path + saya.config.serviceCustomerDetail.pattern.replace('{customer_id}', saya.customer_id);
+
+    var fecth = $.get(url, {}, function (data) {
+
+        console.log('fecthCustomerDetail was successful');
+        saya.saveCustomerOrder(data);
+    }, 'json');
+
+    fecth.fail(function (jqXHR, textStatus, errorThrown) {
+
+        console.log('fecthCustomerDetail was failed');
+    });
+};
+saya.saveCustomerOrder = function (data) {
+
+    saya.total_order = data.total_order;
+    saya.total_order_bundle = data.total_order_bundle;
+
+    // tính toán page dựa vào total và limit
+    saya.order_page = Math.ceil(saya.total_order / saya.order_page_limit);
+    saya.order_bundle_page = Math.ceil(saya.total_order_bundle / saya.order_page_limit);
+
+    // thực hiện ghi lại thông tin
+    localforage.setItem('total_order', data.total_order);
+    localforage.setItem('total_order_bundle', data.total_order_bundle);
+    localforage.setItem('order_page', saya.order_page);
+    localforage.setItem('order_bundle_page', saya.order_bundle_page);
+};
 saya.exitApp = function () {
 
     console.log('Empty cart before exit app!');
@@ -435,6 +488,12 @@ saya.Product = Backbone.Model.extend({
     },
 });
 
+saya.Order = Backbone.Model.extend({
+    initialize: function () {
+        this.config = saya.config;
+    },
+});
+
 saya.Notification = Backbone.Model.extend({
     initialize: function () {
         this.config = saya.config;
@@ -496,12 +555,32 @@ saya.CartCollection = Backbone.Collection.extend({
     sync: Backbone.localforage.sync('carts'),
 });
 
+saya.OrderCollection = Backbone.Collection.extend({
+    initialize: function (models, options) {
+        this.config = saya.config;
+        if (!_.isUndefined(options) && !_.isUndefined(options.page)) {
+
+            this.page = options.page;
+        } else {
+
+            this.page = saya.order_page;
+        }
+    },
+    model: saya.Order,
+    url: function () {
+
+        this.config.serviceOrder.name = this.config.serviceOrder.pattern.replace('{customer_id}', saya.customer_id).replace('{page}', this.page);
+        var url = this.config.serviceDomain + this.config.serviceRoot + this.config.serviceOrder.path + this.config.serviceOrder.name;
+        console.log('OrderCollection: fetch remote data from "' + url + '"');
+        return url;
+    },
+});
+
 saya.CategoryListView = Backbone.View.extend({
     el: '<ul data-role="listview" data-inset="true" />',
     render: function () {
         var models = this.collection.models;
         var self = this;
-        var list = '';
         _.each(models, function (model, index) {
 
             var categoryItem = new saya.CategoryItemView({ model: model, index: index });
@@ -517,7 +596,6 @@ saya.ProductListView = Backbone.View.extend({
     render: function () {
         var models = this.collection.models;
         var self = this;
-        var list = '';
         _.each(models, function (model, index) {
 
             var productItem = new saya.ProductItemView({ model: model, index: index });
@@ -560,7 +638,6 @@ saya.CartListView = Backbone.View.extend({
     render: function () {
         var models = this.collection.models;
         var self = this;
-        var list = '';
         _.each(models, function (model, index) {
 
             var cartItem = new saya.CartItemView({ model: model });
@@ -576,12 +653,37 @@ saya.CheckoutListView = Backbone.View.extend({
     render: function () {
         var models = this.collection.models;
         var self = this;
-        var list = '';
         self.$el.html('');
         _.each(models, function (model, index) {
 
             var cartItem = new saya.CheckoutItemView({ model: model });
             self.$el.append(cartItem.el);
+        });
+
+        return this;
+    },
+});
+
+saya.OrderListView = Backbone.View.extend({
+    initialize: function (options) {
+        this.options = options;
+        _.bindAll(this, 'render');
+    },
+    el: $('#order-list'),
+    render: function () {
+        var models = this.collection.models;
+        var self = this;
+
+        // nếu không định nghĩa tham số append thì thực hiện ghi đè
+        if (_.isUndefined(this.options.append)) {
+
+            self.$el.html('');
+        }
+
+        _.each(models, function (model, index) {
+
+            var orderItem = new saya.OrderItemView({ model: model, index: index });
+            self.$el.append(orderItem.el);
         });
 
         return this;
@@ -855,6 +957,50 @@ saya.CheckoutItemView = Backbone.View.extend({
         variables.price = saya.utli.numberFormat(parseFloat(variables.price));
 
         console.log('Checkout item detail:');
+        console.log(variables);
+
+        var template = this.template(variables);
+
+        this.$el.html(template);
+        return this;
+    },
+});
+
+saya.OrderItemView = Backbone.View.extend({
+    tagName: 'div',
+    template: _.template($('#order-item-tpl').html()),
+    initialize: function () {
+        this.render();
+    },
+    render: function () {
+
+        console.log('Render order item');
+        var variables = this.model.toJSON();
+        var items = variables.items;
+        variables.product_items = [];
+
+        // thực hiện lấy ra label của status
+        variables.status_label = saya.settings.order_status[variables.status] || saya.settings.order_status_unknown;
+
+        // lấy ra class css của status tương ứng
+        variables.status_class = saya.settings.order_status_class[variables.status] || saya.settings.order_status_class_unknown;
+
+        // thực hiện parse lại cấu trúc items
+        _.each(items, function (val, key) {
+
+            var logo_path = saya.config.serviceDomain + val.product_logo_uri;
+            var price = saya.utli.numberFormat(parseFloat(val.product_price));
+            variables.product_items.push({
+                product_id: val.product_id,
+                product_name: val.product_name,
+                product_logo_path: logo_path,
+                product_qty: val.qty,
+                product_price: price,
+                product_unit: val.product_unit,
+            });
+        });
+
+        console.log('Order item detail:');
         console.log(variables);
 
         var template = this.template(variables);
@@ -1161,7 +1307,7 @@ saya.initialize = function () {
 
             order.cart.push({
                 id: item.id,
-                qty:item.qty,
+                qty: item.qty,
             });
         });
 
@@ -1174,18 +1320,23 @@ saya.initialize = function () {
         // thực hiện request lên server
         var order_create = saya.config.serviceDomain + saya.config.serviceOrderCreate.path;
         console.log('order_create = ' + order_create);
-        var req = $.get(order_create, { order:order_json}, function (data) {
+        var req = $.get(order_create, { order: order_json }, function (res) {
 
-            if (data.status == 'success') {
+            if (res.status == 'success') {
 
                 console.log('create the order successful.');
                 console.log('Order info:');
-                console.log(data);
+                console.log(res);
+
+                var data = res.data;
+
+                // thực hiện ghi đè lại thông tin đơn hàng của customer
+                saya.saveCustomerOrder(data);
             } else {
 
                 console.log('create the order fail.');
                 console.log('Error info:');
-                console.log(data);
+                console.log(res);
             }
 
         }, 'json');
@@ -1197,6 +1348,39 @@ saya.initialize = function () {
 
         // saya.openSystemPopup(saya.settings.checkout_success);
         return false;
+    });
+
+    // thực hiện scroll tới cuối "Lịch sử đơn hàng" --> load tiếp các đơn hàng đã có
+    $(window).bind('scroll', function () {
+
+        if ($(window).scrollTop() >= $('#order-list').offset().top + $('#order-list').outerHeight() - window.innerHeight) {
+
+            if (saya.order_bundle_page <= 0) {
+
+                console.log('Have no any order to load.');
+                return false;
+            }
+
+            saya.order_page_load = saya.order_page_load - 1;
+            if (saya.order_page_load <= 0) {
+
+                console.log('No more order to load.');
+                return false;
+            }
+            var $toPage = $('#order-page');
+
+            var orderCollection = new saya.OrderCollection([], { page: saya.order_page_load });
+            orderCollection.fetch({
+                success: function (collection, response, options) {
+
+                    var orderListView = new saya.OrderListView({ collection: collection, append: true });
+                    orderListView.render();
+
+                    $toPage.trigger('create');
+                },
+            });
+
+        }
     });
 
     // Khi thực hiện ấn nút "Tiếp theo" trong #cart-page để tới màn hình thanh toán
@@ -1441,6 +1625,29 @@ saya.initialize = function () {
 
             console.log('about-page: render data');
             $toPage.find('div[role="main"]').html(saya.settings.about_us);
+        } else if (page_id == 'order-page') {
+
+            console.log('order-page: render data');
+            // nếu Lịch sử đơn hàng rỗng, hiện thị message
+            if (saya.order_bundle_page <= 0) {
+
+                $('#order-list').html(saya.settings.order_empty);
+            } else {
+
+                console.log('reset saya.order_page_load = saya.order_bundle_page = ' + saya.order_bundle_page);
+                saya.order_page_load = saya.order_bundle_page;
+
+                var orderCollection = new saya.OrderCollection();
+                orderCollection.fetch({
+                    success: function (collection, response, options) {
+
+                        var orderListView = new saya.OrderListView({ collection: collection });
+                        orderListView.render();
+
+                        $toPage.trigger('create');
+                    },
+                });
+            }
         }
     });
 

@@ -307,3 +307,26 @@ a.cart-item {
     font-weight:bold;
     color: red;
 }
+
+.order-product-logo {
+    width:30% !important;
+}
+.order-product-detail {
+    width:70% !important;
+    padding-left:5px;
+}
+.order-total {
+    text-align:right;
+}
+.order-status-success {
+    color: #5cb85c;
+}
+.order-status-warning {
+    color: #f0ad4e;
+}
+.order-status-info {
+    color: #5bc0de;
+}
+.order-status-danger {
+    color: #d9534f;
+}
