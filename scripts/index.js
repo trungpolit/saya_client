@@ -13,8 +13,8 @@
 "use strict";
 var saya = {};
 saya.config = {
-    //serviceDomain: "http://saya-backend.16mb.com/saya_backend/",
-    serviceDomain: "http://localhost/saya_backend/",
+    serviceDomain: "http://cms.goga.mobi/",
+    //serviceDomain: "http://localhost/saya_backend/",
     //serviceDomain: "http://192.168.5.115/saya_backend/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
@@ -1069,6 +1069,8 @@ saya.initialize = function () {
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
 
+    //$.ajaxSetup({ cache: false });
+
     // điều khiển bấm nút thì rung
     $('body').on('click', '.ui-btn', function () {
 
@@ -1351,9 +1353,24 @@ saya.initialize = function () {
     });
 
     // thực hiện scroll tới cuối "Lịch sử đơn hàng" --> load tiếp các đơn hàng đã có
-    $(window).bind('scroll', function () {
+    var locked = 0; // cờ khóa scroll event, tránh thực hiện scroll 2 lần liên tiếp khi sự kiện scroll trước chưa load xong
+    $(window).on('scrollstop', function () {
 
-        if ($(window).scrollTop() >= $('#order-list').offset().top + $('#order-list').outerHeight() - window.innerHeight) {
+        console.log('scroll event was trigger.');
+
+        // lấy ra page đang active
+        var $activePage = $(":mobile-pagecontainer").pagecontainer("getActivePage");
+        console.log('$activePage:');
+        console.log($activePage);
+
+        if ($activePage.attr('id') == 'order-page') {
+
+            // nếu bị khóa
+            if (locked) {
+
+                console.log('scroll is locked.');
+                return false;
+            }
 
             if (saya.order_bundle_page <= 0) {
 
@@ -1361,26 +1378,44 @@ saya.initialize = function () {
                 return false;
             }
 
-            saya.order_page_load = saya.order_page_load - 1;
-            if (saya.order_page_load <= 0) {
+            var offset = 500;
+            if ($(window).scrollTop() + offset >= $('#order-list').offset().top + $('#order-list').outerHeight() - window.innerHeight) {
 
-                console.log('No more order to load.');
-                return false;
+                saya.order_page_load = saya.order_page_load - 1;
+                if (saya.order_page_load <= 0) {
+
+                    console.log('No more order to load.');
+                    return false;
+                }
+
+                $.mobile.loading('show');
+
+                locked = 1;
+                var orderCollection = new saya.OrderCollection([], { page: saya.order_page_load });
+                orderCollection.fetch({
+                    cache: false,
+                    success: function (collection, response, options) {
+
+                        var orderListView = new saya.OrderListView({ collection: collection, append: true });
+                        orderListView.render();
+
+                        $("#order-list").collapsibleset("refresh");
+                        $.mobile.loading('hide');
+                        locked = 0;
+                    },
+                    error: function (collection, response, options) {
+
+                        console.log('fetch orderCollection was failed. error detail:');
+                        console.log(response);
+                        $.mobile.loading('hide');
+                        saya.order_page_load = saya.order_page_load + 1;
+                        locked = 0;
+                    },
+                });
+
             }
-            var $toPage = $('#order-page');
-
-            var orderCollection = new saya.OrderCollection([], { page: saya.order_page_load });
-            orderCollection.fetch({
-                success: function (collection, response, options) {
-
-                    var orderListView = new saya.OrderListView({ collection: collection, append: true });
-                    orderListView.render();
-
-                    $toPage.trigger('create');
-                },
-            });
-
         }
+
     });
 
     // Khi thực hiện ấn nút "Tiếp theo" trong #cart-page để tới màn hình thanh toán
@@ -1635,16 +1670,25 @@ saya.initialize = function () {
             } else {
 
                 console.log('reset saya.order_page_load = saya.order_bundle_page = ' + saya.order_bundle_page);
+                $('body').spin();
                 saya.order_page_load = saya.order_bundle_page;
 
                 var orderCollection = new saya.OrderCollection();
                 orderCollection.fetch({
+                    cache: false,
                     success: function (collection, response, options) {
 
                         var orderListView = new saya.OrderListView({ collection: collection });
                         orderListView.render();
 
-                        $toPage.trigger('create');
+                        // $toPage.trigger('create');
+                        $("#order-list").collapsibleset("refresh");
+                        $('body').spin(false);
+
+                        if ($("#order-list").outerHeight() <= $(window).height()) {
+
+                            $(window).trigger('scrollstop');
+                        }
                     },
                 });
             }
