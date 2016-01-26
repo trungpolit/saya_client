@@ -10,8 +10,23 @@
 }
 
 @font-face {
-    font-family: 'VNAVAN';
-    src: url('fonts/VNAVAN.TTF') format('truetype');
+    font-family: 'VNI-Tubes';
+    src: url('fonts/VNI-Tubes.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Levenim-MT-Regular';
+    src: url('fonts/Levenim-MT-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Segoe-Print-Regular';
+    src: url('fonts/Segoe-Print-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Times-New-Roman-Italic';
+    src: url('fonts/Times-New-Roman-Italic.ttf') format('truetype');
 }
 
 * {
@@ -37,26 +52,28 @@ body {
 
 .page-title {
     font-size: 1.8em;
+    color:#186031;
 }
 
-span.g1 {
-    font-family: VNAVAN;
-    color: red;
+span.vnitube {
+    font-family: VNI-Tubes;
+    font-size: 1.5em;
+    line-height: 0px;
+    font-weight: 100;
 }
 
-span.o {
-    font-family: VNAVAN;
-    color: #f5be25;
+span.lmt {
+    font-family: Levenim-MT-Regular;
 }
 
-span.g2 {
-    font-family: VNAVAN;
-    color: #3113E7;
+span.spr {
+    font-family: Segoe-Print-Regular;
+    font-weight: 100;
 }
 
-span.a {
-    font-family: VNAVAN;
-    color: #078F0D;
+span.tnmi {
+    font-family: Times-New-Roman-Italic;
+    font-weight: 100;
 }
 
 .region_submit {
@@ -329,4 +346,8 @@ a.cart-item {
 }
 .order-status-danger {
     color: #d9534f;
+}
+
+.header-title {
+    margin: 0px;
 }

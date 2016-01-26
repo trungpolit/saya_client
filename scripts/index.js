@@ -67,6 +67,7 @@ saya.order_page_limit = 5;
 saya.order_page = 0;
 saya.order_bundle_page = 0;
 saya.order_page_load = 0;
+saya.is_vibrate = ''; // chế độ rung?
 
 // Thiết lập giá trị mặc định settings, các thiết lập này sẽ bị ghi đè khi khởi động app
 saya.settings = {};
@@ -155,6 +156,24 @@ saya.openNetworkPopup = function (message) {
         positionTo: "window",
         transition: "pop",
     });
+};
+saya.openCheckoutSuccessPopup = function (message, timeout) {
+
+    if (typeof timeout === "undefined") {
+
+        timeout = this.settings.popup_timeout;
+    }
+
+    $("#checkout-success-content").html(message);
+    $("#checkout-success").popup();
+    $("#checkout-success").popup("open", {
+        positionTo: "window",
+        transition: "pop",
+    });
+    setTimeout(function () {
+
+        $("#checkout-success").popup('close');
+    }, timeout * 1000);
 };
 saya.checkRegionSubmit = function (regions) {
 
@@ -1071,11 +1090,39 @@ saya.initialize = function () {
 
     //$.ajaxSetup({ cache: false });
 
+    // lấy ra trạng thái bật/tắt rung
+    localforage.getItem('is_vibrate', function (error, value) {
+
+        console.log('Get info from is_vibrate');
+        console.log(value);
+        if (!_.isNull(value)) {
+
+            saya.is_vibrate = parseInt(value);
+            console.log('is_vibrate was setted, its value is ' + saya.is_vibrate);
+            if (saya.is_vibrate) {
+
+                $('#enable-vibrate').prop('checked', true);
+            } else {
+
+                $('#enable-vibrate').prop('checked', false);
+            }
+        } else {
+
+            console.log('is_vibrate was not setted, its value is null');
+            saya.is_vibrate = '';
+        }
+    });
+
     // điều khiển bấm nút thì rung
     $('body').on('click', '.ui-btn', function () {
 
+        if (_.isNull(saya.is_vibrate)) {
+
+            saya.is_vibrate = parseInt(saya.settings.enable_vibrate);
+        }
+
         // nếu có bật chế độ rung
-        if (saya.settings.enable_vibrate) {
+        if (saya.is_vibrate) {
 
             $('#enable-vibrate').prop('checked', true);
             var vibrate_time = parseInt(saya.settings.vibrate_time);
@@ -1086,15 +1133,20 @@ saya.initialize = function () {
         }
     });
 
+    // thay đổi bật/tắt chế độ rung
     $('#enable-vibrate').on('change', function () {
 
+        console.log('#enable-vibrate was trigger change');
         if ($(this).prop('checked')) {
 
-            saya.settings.enable_vibrate = 1;
+            saya.is_vibrate = 1;
         } else {
 
-            saya.settings.enable_vibrate = 0;
+            saya.is_vibrate = 0;
         }
+
+        console.log('set is_vibrate = ' + saya.is_vibrate);
+        localforage.setItem('is_vibrate', saya.is_vibrate);
     });
 
     // lấy ra thông tin customer info
@@ -1322,8 +1374,13 @@ saya.initialize = function () {
         // thực hiện request lên server
         var order_create = saya.config.serviceDomain + saya.config.serviceOrderCreate.path;
         console.log('order_create = ' + order_create);
+        $.mobile.loading('show', {
+            text: "Đang xử lý...",
+            textVisible: true,
+        });
         var req = $.get(order_create, { order: order_json }, function (res) {
 
+            $.mobile.loading('hide');
             if (res.status == 'success') {
 
                 console.log('create the order successful.');
@@ -1334,11 +1391,21 @@ saya.initialize = function () {
 
                 // thực hiện ghi đè lại thông tin đơn hàng của customer
                 saya.saveCustomerOrder(data);
+
+                // thực hiện xóa thông tin đơn hàng
+                saya.emptyCart();
+
+                // thực hiện bật popup báo thành công
+                saya.openCheckoutSuccessPopup(saya.settings.checkout_success);
+
             } else {
 
                 console.log('create the order fail.');
                 console.log('Error info:');
                 console.log(res);
+
+                // thực hiện bật popup báo thất bại
+                saya.openSystemPopup(saya.settings.checkout_error);
             }
 
         }, 'json');
@@ -1346,10 +1413,18 @@ saya.initialize = function () {
         req.fail(function (jqXHR, textStatus, errorThrown) {
 
             console.log('Request to create the order was error.');
+            $.mobile.loading('hide');
         });
-
-        // saya.openSystemPopup(saya.settings.checkout_success);
+        
         return false;
+    });
+
+    // thực hiện điều hướng về trang category, khi đặt hàng thành công
+    $('#checkout-success').on('popupafterclose', function (event, ui) {
+
+        console.log('#checkout-success popupafterclose event was trigger');
+        console.log('return to #category-page');
+        $(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slide" });
     });
 
     // thực hiện scroll tới cuối "Lịch sử đơn hàng" --> load tiếp các đơn hàng đã có
