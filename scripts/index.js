@@ -384,7 +384,14 @@ saya.exitApp = function () {
     saya.emptyCart();
 
     console.log('Exit app');
-    navigator.app.exitApp();
+    if (navigator.app) {
+        navigator.app.exitApp();
+    }
+    else if (navigator.device) {
+        navigator.device.exitApp();
+    }
+
+    window.close();
 };
 saya.emptyCart = function () {
 
@@ -1167,7 +1174,19 @@ saya.initialize = function () {
     document.addEventListener('online', saya.onOnline, false);
 
     // vô hiệu hóa nút back
-    document.addEventListener("backbutton", saya.onBackKeyDown, false);
+    if (device.platform == "windows") {
+
+        // Get the back button working in WP8.1
+        WinJS.Application.onbackclick = function (event) {
+
+            // saya.onBackKeyDown();
+            return true; // This line is important, without it the app closes.
+        }
+    }
+    else {
+
+        document.addEventListener("backbutton", saya.onBackKeyDown, false);
+    }
 
     saya.settingPromise = saya.fecthSetting();
     saya.initializePage();
