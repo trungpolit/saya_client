@@ -348,6 +348,19 @@ a.cart-item {
     color: #d9534f;
 }
 
+.order-status-success > a {
+    color: #5cb85c !important;
+}
+.order-status-warning > a {
+    color: #f0ad4e !important;
+}
+.order-status-info > a {
+    color: #5bc0de !important;
+}
+.order-status-danger > a {
+    color: #d9534f !important;
+}
+
 .header-title {
     margin: 0px;
 }

@@ -13,8 +13,8 @@
 "use strict";
 var saya = {};
 saya.config = {
-    serviceDomain: "http://cms.goga.mobi/",
-    //serviceDomain: "http://localhost/saya_backend/",
+    //serviceDomain: "http://cms.goga.mobi/",
+    serviceDomain: "http://localhost/saya_backend/",
     //serviceDomain: "http://192.168.5.115/saya_backend/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
@@ -87,9 +87,9 @@ saya.settings.share_link = 'https://goo.gl/E5G9tL';
 saya.settings.share_image = null;
 saya.settings.enable_vibrate = 1;
 saya.settings.vibrate_time = 100;
-saya.settings.order_status = { "0": "Thất bại", "1": "Thành công", "2": "Đang xử lý", "3": "Đã hủy", "4": "Cảnh cáo" };
+saya.settings.order_status = ["Hủy", "Thành công", "Chờ xử lý", "Giả mạo"];
 saya.settings.order_status_unknown = 'Không xác định';
-saya.settings.order_status_class = { "0": "order-status-warning", "1": "order-status-success", "2": "order-status-pending", "3": "order-status-info", "4": "order-status-danger" };
+saya.settings.order_status_class = ["order-status-warning", "order-status-success", "order-status-pending", "order-status-danger"];
 saya.settings.order_status_class_unknown = 'order-status-unknown';
 saya.settings.order_empty = 'Hiện tại, bạn chưa đặt bất cứ đơn hàng nào cả.';
 
@@ -112,9 +112,10 @@ saya.setCustomerId = function () {
 
         if (!value) {
 
-            value = device.uuid | saya.utli.guid();
+            value = device.uuid;
             if (value == 0 || value == '') {
 
+                console.log('get customer_id from saya.utli.guid()');
                 value = saya.utli.guid();
             }
             console.log('set customer_id = ' + value);
@@ -280,6 +281,8 @@ saya.fecthSetting = function () {
     var fecthSetting = setting.fetch();
     fecthSetting.done(function (data, textStatus, jqXHR) {
 
+        console.log('fecthSetting was done, settings from sever:');
+        console.log(data);
         localforage.setItem('settings', data, function (err, value) {
 
             if (!value) {
@@ -296,11 +299,9 @@ saya.fecthSetting = function () {
         _.each(data, function (value, key) {
 
             console.log('override saya.settings.' + key + ' from server');
-            if (_.isObject(value)) {
-
-                return;
-            }
             saya.settings[key] = value;
+            console.log('saya.settings.' + key + ' was overridden to:');
+            console.log(saya.settings[key]);
         });
 
         $('body').spin(false);
@@ -1006,10 +1007,13 @@ saya.OrderItemView = Backbone.View.extend({
         variables.product_items = [];
 
         // thực hiện lấy ra label của status
-        variables.status_label = saya.settings.order_status[variables.status] || saya.settings.order_status_unknown;
+        variables.status_label = saya.settings.order_status[variables.status];
 
         // lấy ra class css của status tương ứng
-        variables.status_class = saya.settings.order_status_class[variables.status] || saya.settings.order_status_class_unknown;
+        variables.status_class = saya.settings.order_status_class[variables.status];
+
+        // format lại chuỗi created
+        variables.created_label = saya.utli.formatDateTime(variables.created);
 
         // thực hiện parse lại cấu trúc items
         _.each(items, function (val, key) {
@@ -1085,13 +1089,22 @@ saya.utli.getYearMonth = function () {
     var year_month = yyyy.toString() + mm.toString();
     return year_month;
 };
+saya.utli.formatDateTime = function (str) {
+
+    var d = new Date(str);
+
+    var datestring = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" +
+     d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+
+    return datestring;
+};
 
 // khởi tạo luôn cartCollection toàn cục, dùng chung cho cả ứng dụng
 saya.cart = new saya.CartCollection();
 
 saya.initialize = function () {
 
-    //FastClick.attach(document.body);
+    FastClick.attach(document.body);
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
 
@@ -1434,7 +1447,7 @@ saya.initialize = function () {
             console.log('Request to create the order was error.');
             $.mobile.loading('hide');
         });
-        
+
         return false;
     });
 
