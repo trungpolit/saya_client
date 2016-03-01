@@ -15,7 +15,7 @@ var saya = {};
 saya.config = {
     //serviceDomain: "http://cms.goga.mobi/",
     serviceDomain: "http://localhost/saya_backend/",
-    //serviceDomain: "http://192.168.5.115/saya_backend/",
+    //serviceDomain: "http://192.168.5.151/saya_backend/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
         name: 'settings.json',
@@ -45,7 +45,13 @@ saya.config = {
         path: 'customers/',
         pattern: '{customer_id}.json',
     },
+    serviceFeedbackCreate: {
+        path: 'FeedbackServices/create',
+    },
 };
+// phiên bản app hiện tại
+saya.client_version = 1;
+saya.is_update = 0;
 // trạng thái của network
 saya.networkStatus = 1;
 // settingPromise xác định thời điểm khi nào lấy được setting thành công
@@ -92,6 +98,7 @@ saya.settings.order_status_unknown = 'Không xác định';
 saya.settings.order_status_class = ["order-status-warning", "order-status-success", "order-status-pending", "order-status-danger"];
 saya.settings.order_status_class_unknown = 'order-status-unknown';
 saya.settings.order_empty = 'Hiện tại, bạn chưa đặt bất cứ đơn hàng nào cả.';
+saya.settings.client_version_message = 'Đã có phiên bản ứng dụng mới với nhiều tính năng mới hấp dẫn và tiện dùng hơn. Bạn hãy cập nhật ngay nhé!';
 
 saya.caculateCartTotalPrice = function (cart) {
 
@@ -175,6 +182,33 @@ saya.openCheckoutSuccessPopup = function (message, timeout) {
 
         $("#checkout-success").popup('close');
     }, timeout * 1000);
+};
+saya.openFeedbackSuccessPopup = function (message, timeout) {
+
+    if (typeof timeout === "undefined") {
+
+        timeout = this.settings.popup_timeout;
+    }
+
+    $("#feedback-success-content").html(message);
+    $("#feedback-success").popup();
+    $("#feedback-success").popup("open", {
+        positionTo: "window",
+        transition: "pop",
+    });
+    setTimeout(function () {
+
+        $("#feedback-success").popup('close');
+    }, timeout * 1000);
+};
+saya.openUpdatePopup = function () {
+
+    $('#update-popup-content').html(saya.settings.client_version_message);
+    $("#update-popup").popup();
+    $("#update-popup").popup("open", {
+        positionTo: "window",
+        transition: "pop",
+    });
 };
 saya.checkRegionSubmit = function (regions) {
 
@@ -303,6 +337,30 @@ saya.fecthSetting = function () {
             console.log('saya.settings.' + key + ' was overridden to:');
             console.log(saya.settings[key]);
         });
+
+        // thực hiện kiểm tra xem app có phiên bản mới hay không?
+        if (!_.isEmpty(data.client_versions)) {
+
+            var client_versions = data.client_versions;
+            _.each(client_versions, function (value, key) {
+
+                var platform_os = value.platform_os.toLowerCase();
+                var platform_version = value.platform_version;
+                if (platform_os == device.platform.toLowerCase()) {
+
+                    console.log('Compare device.platform with the platform_os setting: ' + platform_os);
+                    if (saya.client_version < platform_version) {
+
+                        console.log('Have a new platform_version: ' + platform_os + ' greater than saya.client_version' + saya.client_version);
+                        saya.is_update = 1;
+                        //saya.openUpdatePopup();
+                    }
+
+                    return;
+                }
+             
+            });
+        }
 
         $('body').spin(false);
     });
@@ -1566,6 +1624,68 @@ saya.initialize = function () {
         }
     });
 
+    // Khi thực hiện ấn vào nút "Gửi"
+    $('#contact-submit').on('click', function () {
+
+        var name = $.trim($('#contact-name').val());
+        var description = $.trim($('#contact-description').val());
+
+        var params = {};
+        params.name = name;
+        params.description = description;
+        params.platform_os = device.platform;
+        params.platform_version = device.version;
+
+        var customer_code = saya.customer_id;
+        params.customer_code = customer_code;
+
+        // Lấy ra thông tin customer
+        localforage.getItem('customer_info', function (err, value) {
+
+            if (_.isObject(value)) {
+
+                var customer_name = value.fullname;
+                var customer_mobile = value.mobile;
+                var customer_mobile2 = value.mobile2;
+
+                params.customer_name = customer_name;
+                params.customer_mobile = customer_mobile;
+                params.customer_mobile2 = customer_mobile2;
+            }
+
+            var feedback_service = saya.config.serviceDomain + saya.config.serviceFeedbackCreate.path;
+            $.mobile.loading('show', {
+                text: "Đang gửi...",
+                textVisible: true,
+            });
+            var req = $.post(feedback_service, params, function (data) {
+
+                $.mobile.loading('hide');
+                if (data.status == 'success') {
+
+                    saya.openFeedbackSuccessPopup(saya.settings.feedback_success);
+                } else {
+
+                    saya.openSystemPopup(saya.settings.feedback_error);
+                }
+            });
+
+            req.fail(function (jqXHR, textStatus, errorThrown) {
+
+                $.mobile.loading('hide');
+                saya.openSystemPopup(saya.settings.feedback_error);
+            });
+        });
+    });
+
+    // thực hiện điều hướng về trang category, khi feedback thành công
+    $('#feedback-success').on('popupafterclose', function (event, ui) {
+
+        console.log('#feedback-success popupafterclose event was trigger');
+        console.log('return to #category-page');
+        $(":mobile-pagecontainer").pagecontainer("change", $('#category-page'), { transition: "slide" });
+    });
+
     $(document).on("pagecontainerbeforeshow", function (event, ui) {
 
         console.log('document: pagecontainerbeforeshow trigger');
@@ -1802,9 +1922,27 @@ saya.initialize = function () {
         }
     });
 
-    $(":mobile-pagecontainer").on("pagecontainershow", function (event, ui) {
+    $(document).on("pagecontainershow", function (event, ui) {
 
-        saya.popupNetworkOffline();
+        //saya.popupNetworkOffline();
+        console.log('document: pagecontainershow trigger');
+        var activePage = $.mobile.pageContainer.pagecontainer("getActivePage");
+        var page_id = activePage[0].id;
+        console.log('page_id: ' + page_id);
+
+        if (page_id == 'region-page') {
+
+            if (saya.is_update) {
+
+                saya.openUpdatePopup();
+            }
+        } else if (page_id == 'category-page') {
+
+            if (saya.is_update) {
+
+                saya.openUpdatePopup();
+            }
+        }
     });
 };
 

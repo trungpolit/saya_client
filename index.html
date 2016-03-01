@@ -502,7 +502,13 @@
         </div><!-- /header -->
 
         <div role="main" class="ui-content">
-
+            <label for="contact-name" class="label"><strong><span>Tiêu đề</span><span class="requied">(</span><span class="requied">*</span><span class="requied">)</span></strong></label>
+            <input type="text" name="name" id="contact-name" value="" required>
+            <label for="contact-description" class="label"><strong><span>Nội dung</span><span class="requied">(</span><span class="requied">*</span><span class="requied">)</span></strong></label>
+            <textarea cols="40" rows="8" name="description" id="contact-description"></textarea>
+            <div>
+                <button class="ui-btn ui-icon-delete ui-btn-icon-left ui-icon-fa-send" id="contact-submit">Gửi</button>
+            </div>
         </div><!-- /content -->
 
         <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="contact-panel" data-position="right">
@@ -532,6 +538,11 @@
                     </div>
                 </li>
             </ul>
+        </div>
+
+        <div data-role="popup" id="feedback-success" data-overlay-theme="b" data-theme="a">
+            <div role="main" class="ui-content" id="feedback-success-content">
+            </div>
         </div>
     </div>
 
@@ -634,6 +645,10 @@
     </div>
     <div id="network-popup" data-theme="a" data-role="popup" class="hidden" data-overlay-theme="b" data-dismissible="false">
         <div id="network-popup-content" class="ui-content">
+        </div>
+    </div>
+    <div id="update-popup" data-theme="a" data-role="popup" class="hidden" data-overlay-theme="b" data-dismissible="false">
+        <div id="update-popup-content" class="ui-content">
         </div>
     </div>
 
