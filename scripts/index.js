@@ -51,9 +51,14 @@ saya.config = {
 };
 // phiên bản app hiện tại
 saya.client_version = 1;
+// biến cờ xác định xem app có cần update hay không?
 saya.is_update = 0;
+// biến cờ xác định trong trường hợp app update thì đã hiện thị popup thông báo update hay chưa?
+saya.open_update_popup_count = 0;
 // trạng thái của network
 saya.networkStatus = 1;
+// Đường dẫn download app khi có update
+saya.download_link = '';
 // settingPromise xác định thời điểm khi nào lấy được setting thành công
 saya.settingPromise = {};
 saya.notificationPromise = {};
@@ -353,7 +358,7 @@ saya.fecthSetting = function () {
 
                         console.log('Have a new platform_version: ' + platform_os + ' greater than saya.client_version' + saya.client_version);
                         saya.is_update = 1;
-                        //saya.openUpdatePopup();
+                        saya.download_link = value.download_link;
                     }
 
                     return;
@@ -1166,7 +1171,7 @@ saya.initialize = function () {
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
 
-    //$.ajaxSetup({ cache: false });
+    $.ajaxSetup({ cache: false });
 
     // lấy ra trạng thái bật/tắt rung
     localforage.getItem('is_vibrate', function (error, value) {
@@ -1924,7 +1929,6 @@ saya.initialize = function () {
 
     $(document).on("pagecontainershow", function (event, ui) {
 
-        //saya.popupNetworkOffline();
         console.log('document: pagecontainershow trigger');
         var activePage = $.mobile.pageContainer.pagecontainer("getActivePage");
         var page_id = activePage[0].id;
@@ -1932,17 +1936,31 @@ saya.initialize = function () {
 
         if (page_id == 'region-page') {
 
-            if (saya.is_update) {
+            // nếu app cần update và chưa hiện thị thông báo popup update lên lần nào thì hiện thị popup
+            if (saya.is_update && saya.open_update_popup_count < 1) {
 
+                // bật popup thông báo update
                 saya.openUpdatePopup();
+                // tăng +1 số lần hiện thị thông báo popup update
+                saya.open_update_popup_count += 1;
             }
         } else if (page_id == 'category-page') {
 
-            if (saya.is_update) {
+            // nếu app cần update và chưa hiện thị thông báo popup update lên lần nào thì hiện thị popup
+            if (saya.is_update && saya.open_update_popup_count < 1) {
 
+                // bật popup thông báo update
                 saya.openUpdatePopup();
+                // tăng +1 số lần hiện thị thông báo popup update
+                saya.open_update_popup_count += 1;
             }
         }
+    });
+
+    // nếu người dùng đồng ý update app, thì mở ra link để download phiên bản mới
+    $('#update-confirm-ok').on('click', function () {
+
+        var open_download_link = cordova.InAppBrowser.open(saya.download_link, '_blank', 'location=yes');
     });
 };
 
