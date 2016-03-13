@@ -13,8 +13,8 @@
 "use strict";
 var saya = {};
 saya.config = {
-    //serviceDomain: "http://cms.goga.mobi/",
-    serviceDomain: "http://localhost/saya_backend/",
+    serviceDomain: "http://cms.goga.mobi/",
+    //serviceDomain: "http://localhost/saya_backend/",
     //serviceDomain: "http://192.168.5.151/saya_backend/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
@@ -365,6 +365,16 @@ saya.fecthSetting = function () {
                 }
              
             });
+        }
+
+        // thực hiện kiểm tra xem có thiết lập ads hay không?
+        if (!_.isEmpty(data.ads)) {
+
+            var ads = data.ads[0];
+            var ads_description = ads.description;
+            $('#ads-description').find('h3').html(ads_description);
+            $('#ads-description').removeClass('ads-hidden');
+            //$('#ads-description').toolbar("refresh");
         }
 
         $('body').spin(false);
@@ -838,15 +848,15 @@ saya.ProductItemView = Backbone.View.extend({
         var logo_uri = _.isArray(this.model.get('logo_uri')) ? this.model.get('logo_uri')[0] : '';
         variables.logo_path = saya.config.serviceDomain + logo_uri;
 
-        variables.serialize = JSON.stringify(variables);
+        variables.serialize = _.escape(JSON.stringify(variables));
         variables.price = saya.utli.numberFormat(parseFloat(variables.price));
 
         console.log('Product item detail:');
         console.log(variables);
 
         var template = this.template(variables);
-
         this.$el.html(template);
+
         return this;
     },
     events: {
@@ -959,7 +969,7 @@ saya.CartItemView = Backbone.View.extend({
         var logo_uri = _.isArray(this.model.get('logo_uri')) ? this.model.get('logo_uri')[0] : '';
         variables.logo_path = saya.config.serviceDomain + logo_uri;
 
-        variables.serialize = JSON.stringify(variables);
+        variables.serialize = _.escape(JSON.stringify(variables));
         variables.price = saya.utli.numberFormat(parseFloat(variables.price));
         variables.max_qty = saya.settings.max_product_qty;
 
@@ -967,8 +977,8 @@ saya.CartItemView = Backbone.View.extend({
         console.log(variables);
 
         var template = this.template(variables);
-
         this.$el.html(template);
+
         return this;
     },
     events: {
@@ -1077,6 +1087,8 @@ saya.OrderItemView = Backbone.View.extend({
 
         // format lại chuỗi created
         variables.created_label = saya.utli.formatDateTime(variables.created);
+
+        variables.total_price = saya.utli.numberFormat(parseFloat(variables.total_price));
 
         // thực hiện parse lại cấu trúc items
         _.each(items, function (val, key) {
@@ -1961,6 +1973,13 @@ saya.initialize = function () {
     $('#update-confirm-ok').on('click', function () {
 
         var open_download_link = cordova.InAppBrowser.open(saya.download_link, '_blank', 'location=yes');
+    });
+
+    $('body').on('click','#ads-description a', function () {
+
+        var link = $(this).attr('href');
+        var open_link = cordova.InAppBrowser.open(link, '_blank', 'location=yes');
+        return false;
     });
 };
 

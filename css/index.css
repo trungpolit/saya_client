@@ -365,3 +365,6 @@ a.cart-item {
     margin: 0px;
 }
 
+.ads-hidden {
+    display: none;
+}

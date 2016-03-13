@@ -63,6 +63,10 @@
             </div>
         </div><!-- /content -->
 
+        <div data-role="footer" data-position="fixed" class="ads-hidden" id="ads-description">
+            <h3></h3>
+        </div>
+
         <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="category-panel" data-position="right">
             <ul data-role="listview">
                 <li class="customer-welcome" data-rel="close">&nbsp;</li>
@@ -90,6 +94,16 @@
                     </div>
                 </li>
             </ul>
+        </div>
+
+        <div id="update-popup" data-theme="a" data-role="popup" class="hidden" data-overlay-theme="b" data-dismissible="false">
+            <div class="ui-content">
+                <div id="update-popup-content"></div>
+                <div class="button-center">
+                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="update-confirm-ok">&nbsp;&nbsp;&nbsp;Có&nbsp;&nbsp;&nbsp;</a>
+                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="update-confirm-cancel">Không</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -640,19 +654,12 @@
         </div>
     </div>
 
-    <div id="system-popup" data-theme="a" data-role="popup" class="hidden">
-        <div id="system-popup-content" class="ui-content"></div>
-    </div>
-    <div id="network-popup" data-theme="a" data-role="popup" class="hidden" data-overlay-theme="b" data-dismissible="false">
-        <div id="network-popup-content" class="ui-content">
+    <div data-role="page" id="popup-container-page" data-theme="a">
+        <div id="system-popup" data-theme="a" data-role="popup" class="hidden">
+            <div id="system-popup-content" class="ui-content"></div>
         </div>
-    </div>
-    <div id="update-popup" data-theme="a" data-role="popup" class="hidden" data-overlay-theme="b" data-dismissible="false">
-        <div class="ui-content">
-            <div id="update-popup-content"></div>
-            <div class="button-center">
-                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="update-confirm-ok">&nbsp;&nbsp;&nbsp;Có&nbsp;&nbsp;&nbsp;</a>
-                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="update-confirm-cancel">Không</a>
+        <div id="network-popup" data-theme="a" data-role="popup" class="hidden" data-overlay-theme="b" data-dismissible="false">
+            <div id="network-popup-content" class="ui-content">
             </div>
         </div>
     </div>
