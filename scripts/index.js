@@ -98,9 +98,9 @@ saya.settings.share_link = 'https://goo.gl/E5G9tL';
 saya.settings.share_image = null;
 saya.settings.enable_vibrate = 1;
 saya.settings.vibrate_time = 100;
-saya.settings.order_status = ["Hủy", "Thành công", "Chờ xử lý", "Giả mạo"];
+saya.settings.order_status = ["Hủy", "Thành công", "Chờ xử lý", "Giả mạo", "Đang xử lý"];
 saya.settings.order_status_unknown = 'Không xác định';
-saya.settings.order_status_class = ["order-status-warning", "order-status-success", "order-status-pending", "order-status-danger"];
+saya.settings.order_status_class = ["order-status-warning", "order-status-success", "order-status-pending", "order-status-danger", "order-status-info"];
 saya.settings.order_status_class_unknown = 'order-status-unknown';
 saya.settings.order_empty = 'Hiện tại, bạn chưa đặt bất cứ đơn hàng nào cả.';
 saya.settings.client_version_message = 'Đã có phiên bản ứng dụng mới với nhiều tính năng mới hấp dẫn và tiện dùng hơn. Bạn hãy cập nhật ngay nhé!';
@@ -134,7 +134,8 @@ saya.setCustomerId = function () {
             localforage.setItem('customer_id', value);
         }
 
-        saya.customer_id = value;
+        // saya.customer_id = value;
+        saya.customer_id = '9f453cc6a651d89';
 
         // lấy thông tin về customer
         saya.fecthCustomerDetail();
@@ -428,7 +429,8 @@ saya.fecthCustomerDetail = function () {
 
     var fecth = $.get(url, {}, function (data) {
 
-        console.log('fecthCustomerDetail was successful');
+        console.log('fecthCustomerDetail was successful, customer details:');
+        console.log(data);
         saya.saveCustomerOrder(data);
     }, 'json');
 
@@ -663,7 +665,7 @@ saya.OrderCollection = Backbone.Collection.extend({
             this.page = options.page;
         } else {
 
-            this.page = saya.order_page;
+            this.page = saya.order_bundle_page;
         }
     },
     model: saya.Order,
@@ -1053,7 +1055,7 @@ saya.CheckoutItemView = Backbone.View.extend({
         var logo_uri = _.isArray(this.model.get('logo_uri')) ? this.model.get('logo_uri')[0] : '';
         variables.logo_path = saya.config.serviceDomain + logo_uri;
 
-        variables.serialize = JSON.stringify(variables);
+        variables.serialize = _.escape(JSON.stringify(variables));
         variables.price = saya.utli.numberFormat(parseFloat(variables.price));
 
         console.log('Checkout item detail:');
