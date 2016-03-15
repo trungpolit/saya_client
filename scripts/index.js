@@ -4,6 +4,7 @@
 /// <reference path="libs/jquery.spin.js" />
 /// <reference path="libs/localforage.backbone.js" />
 /// <reference path="libs/jquery.mobile-1.4.5.js" />
+/// <reference path="libs/moment.js" />
 /// <reference path="libs/localforage.js" />
 // For an introduction to the Blank template, see the following documentation:
 // http://go.microsoft.com/fwlink/?LinkID=397704
@@ -134,8 +135,8 @@ saya.setCustomerId = function () {
             localforage.setItem('customer_id', value);
         }
 
-        // saya.customer_id = value;
-        saya.customer_id = '9f453cc6a651d89';
+        saya.customer_id = value;
+        // saya.customer_id = '9f453cc6a651d89';
 
         // lấy thông tin về customer
         saya.fecthCustomerDetail();
@@ -1168,10 +1169,7 @@ saya.utli.getYearMonth = function () {
 };
 saya.utli.formatDateTime = function (str) {
 
-    var d = new Date(str);
-
-    var datestring = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" +
-     d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+    var datestring = moment(str).format("DD/MM/YYYY HH:mm");
 
     return datestring;
 };
