@@ -90,12 +90,12 @@ saya.settings.not_exist_region = 'Quận/Huyện/Thị xã mà bạn đã chọn
 saya.settings.empty_cart = 'Giỏ hàng hiện tại không chứa sản phẩm nào.';
 saya.settings.offline_network = 'Hãy bật dữ liệu mạng hoặc wifi.';
 saya.settings.notification_on_pause_timeout = 300000;
-saya.settings.notification_on_pause_message = 'Đặt hàng nhanh tay, rinh ngay giải thưởng!';
+saya.settings.notification_on_pause_message = 'Xin mời ghé thăm onGas để tham khảo sản phẩm và giá cả mới cập nhật !';
 saya.settings.notification_on_exit_timeout = 300000;
-saya.settings.notification_on_exit_message = 'Đã lâu rồi, bạn không ghé thăm!';
-saya.settings.share_message = 'Ứng dụng hay tải ngay, nhận ngay ưu đãi!';
-saya.settings.share_subject = 'Tải ngay ứng dụng GOGA';
-saya.settings.share_link = 'https://goo.gl/E5G9tL';
+saya.settings.notification_on_exit_message = 'Xin mời ghé thăm onGas để tham khảo sản phẩm và giá cả mới cập nhật !';
+saya.settings.share_message = 'Ứng dụng miễn phí về sản phẩm thiết yếu cho gia đình, mời bạn tải theo đường dẫn: http://ongas.vn';
+saya.settings.share_subject = 'onGas - kết nối niềm tin';
+saya.settings.share_link = null;
 saya.settings.share_image = null;
 saya.settings.enable_vibrate = 1;
 saya.settings.vibrate_time = 100;
@@ -374,7 +374,7 @@ saya.fecthSetting = function () {
 
             var ads = data.ads[0];
             var ads_description = ads.description;
-            $('#ads-description').find('h3').html(ads_description);
+            $('#ads-description').find('span').html(ads_description);
             $('#ads-description').removeClass('ads-hidden');
             //$('#ads-description').toolbar("refresh");
         }
@@ -459,6 +459,19 @@ saya.exitApp = function () {
 
     console.log('Empty cart before exit app!');
     saya.emptyCart();
+
+    var now = new Date().getTime(),
+    timeout = new Date(now + saya.settings.notification_on_exit_timeout * 1000);
+    var sound = device.platform == 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
+
+    cordova.plugins.notification.local.schedule({
+        id: 1,
+        text: saya.settings.notification_on_exit_message,
+        at: timeout,
+        led: "FF0000",
+        badge: 1,
+        sound: sound,
+    });
 
     console.log('Exit app');
     if (navigator.app) {
@@ -1991,10 +2004,11 @@ saya.onPause = function () {
     var sound = device.platform == 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
 
     cordova.plugins.notification.local.schedule({
+        id:1,
         text: saya.settings.notification_on_pause_message,
         at: timeout,
         led: "FF0000",
-        badge: 3,
+        badge: 1,
         sound: sound,
     });
 };
