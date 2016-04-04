@@ -18,6 +18,24 @@
     <link href="css/jquery.mobile.overridden.css" rel="stylesheet" />
     <link href="css/jqm-font-awesome/jqm-font-awesome-isvg-ipng.css" rel="stylesheet" />
     <link href="css/index.css" rel="stylesheet" />
+    <style>
+        * {
+            zoom: 1;
+        }
+
+        @-ms-viewport {
+            width: auto !important;
+        }
+
+        html {
+            overflow: hidden;
+            -ms-content-zooming: none;
+        }
+
+        body {
+            -ms-touch-action: pan-y;
+        }
+    </style>
 </head>
 <body>
     <div data-role="page" id="region-page" data-theme="a">
@@ -654,13 +672,11 @@
         </div>
     </div>
 
-    <div data-role="page" id="popup-container-page" data-theme="a">
-        <div id="system-popup" data-theme="a" data-role="popup" class="hidden">
-            <div id="system-popup-content" class="ui-content"></div>
-        </div>
-        <div id="network-popup" data-theme="a" data-role="popup" class="hidden" data-overlay-theme="b" data-dismissible="false">
-            <div id="network-popup-content" class="ui-content">
-            </div>
+    <div id="system-popup" data-theme="a" data-role="popup">
+        <div id="system-popup-content" class="ui-content"></div>
+    </div>
+    <div id="network-popup" data-theme="a" data-role="popup" data-overlay-theme="b" data-dismissible="false">
+        <div id="network-popup-content" class="ui-content">
         </div>
     </div>
 

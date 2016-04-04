@@ -10,13 +10,13 @@
 // http://go.microsoft.com/fwlink/?LinkID=397704
 // To debug code on page load in Ripple or on Android devices/emulators: launch your app, set breakpoints, 
 // and then run "window.location.reload()" in the JavaScript Console.
-
 "use strict";
 var saya = {};
 saya.config = {
-    serviceDomain: "http://cms.goga.mobi/",
-    //serviceDomain: "http://localhost/saya_backend/",
+    //serviceDomain: "http://cms.goga.mobi/",
+    //serviceDomain: "http://ongas.cms/",
     //serviceDomain: "http://192.168.5.151/saya_backend/",
+    serviceDomain: "http://cms.ongas.vn/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
         name: 'settings.json',
@@ -150,7 +150,7 @@ saya.openSystemPopup = function (message, timeout) {
     }
 
     $("#system-popup-content").html(message);
-    $("#system-popup").popup();
+    //$("#system-popup").popup();
     $("#system-popup").popup("open", {
         positionTo: "window",
         transition: "pop",
@@ -166,7 +166,7 @@ saya.openNetworkPopup = function (message) {
 
     console.log('NetworkPopup is opening ...');
     $("#network-popup-content").html(message);
-    $("#network-popup").popup();
+    //$("#network-popup").popup();
     $("#network-popup").popup("open", {
         positionTo: "window",
         transition: "pop",
@@ -1192,11 +1192,13 @@ saya.cart = new saya.CartCollection();
 
 saya.initialize = function () {
 
-    FastClick.attach(document.body);
+    //FastClick.attach(document.body);
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
 
     $.ajaxSetup({ cache: false });
+    $("#system-popup").enhanceWithin().popup();
+    $("#network-popup").enhanceWithin().popup();
 
     // lấy ra trạng thái bật/tắt rung
     localforage.getItem('is_vibrate', function (error, value) {
@@ -1782,27 +1784,72 @@ saya.initialize = function () {
                     return;
                 }
 
+                // thực hiện phân tích, trích xuất ra notification vẫn đang còn hiệu lực
+                var show_notifications = [];
+                var current_time = moment().valueOf();
+                _.each(notifications, function (item, index) {
+
+                    var begin_at = moment(item.begin_at).valueOf();
+                    var end_at = moment(item.end_at).valueOf();
+                    if (current_time >= begin_at && current_time <= end_at) {
+
+                        show_notifications.push(item);
+                    }
+                });
+
+                if (_.isEmpty(show_notifications)) {
+
+                    return;
+                }
+
                 (function myLoop(i) {
 
-                    $('.marquee').html(notifications[i - 1].description);
+                    var current_time = moment().valueOf();
+                    var begin_at = moment(show_notifications[i - 1].begin_at).valueOf();
+                    var end_at = moment(show_notifications[i - 1].end_at).valueOf();
+                    if (current_time < begin_at || current_time > end_at) {
+
+                        delete show_notifications[i - 1];
+                        show_notifications = _.compact(show_notifications);
+                        if (!show_notifications.length) {
+                            $('.marquee').html('');
+                            $('.marquee').marquee('destroy');
+                            return;
+                        }
+                    }
+
+                    $('.marquee').html(show_notifications[i - 1].description);
                     $('.marquee').marquee({
                         // pauseOnHover: true,
                     }).bind('finished', function () {
                         $(this).marquee('destroy');
-                        $(this).html(notifications[i - 1].description).marquee();
+                        var current_time = moment().valueOf();
+                        var begin_at = moment(show_notifications[i - 1].begin_at).valueOf();
+                        var end_at = moment(show_notifications[i - 1].end_at).valueOf();
+                        if (current_time < begin_at || current_time > end_at) {
+
+                            delete show_notifications[i - 1];
+                            show_notifications = _.compact(show_notifications);
+                            if (!show_notifications.length) {
+                                $(this).html('');
+                                $(this).marquee('destroy');
+                                return;
+                            }
+                        }
+                        $(this).html(show_notifications[i - 1].description).marquee();
                         if (--i) {
 
                             myLoop(i);
                         } else {
 
-                            i = notifications.length;
+                            i = show_notifications.length;
                             myLoop(i);
                         }
                     }).unbind('vmouseover vmouseout').bind('vmouseover vmouseout', function () {
 
                         $(this).marquee('toggle');
                     });
-                })(notifications.length);
+                })(show_notifications.length);
             });
 
             saya.notificationPromise.fail(function () {
@@ -1988,12 +2035,12 @@ saya.initialize = function () {
         var open_download_link = cordova.InAppBrowser.open(saya.download_link, '_blank', 'location=yes');
     });
 
-    $('body').on('click','#ads-description a', function () {
+    //$('body').on('click','#ads-description a', function () {
 
-        var link = $(this).attr('href');
-        var open_link = cordova.InAppBrowser.open(link, '_blank', 'location=yes');
-        return false;
-    });
+    //    var link = $(this).attr('href');
+    //    var open_link = cordova.InAppBrowser.open(link, '_blank', 'location=yes');
+    //    return false;
+    //});
 };
 
 saya.onPause = function () {

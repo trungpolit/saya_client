@@ -368,3 +368,7 @@ a.cart-item {
 .ads-hidden {
     display: none;
 }
+
+#ads-description {
+    font-weight:normal !important;
+}
