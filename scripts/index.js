@@ -1192,7 +1192,7 @@ saya.cart = new saya.CartCollection();
 
 saya.initialize = function () {
 
-    //FastClick.attach(document.body);
+    FastClick.attach(document.body);
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
 
