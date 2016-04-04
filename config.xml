@@ -104,17 +104,17 @@
       <vs:name>onGas</vs:name>
     </vs:platformSpecificWidget>
   </vs:platformSpecificValues>
-  <plugin name="cordova-plugin-vibration" spec="2.1.0" source="pgb" />
+  <plugin name="cordova-plugin-vibration" spec="2.1.0" source="npm" />
   <preference name="KeepRunning" value="True" />
   <preference name="ShowTitle" value="True" />
   <preference name="InAppBrowserStorageEnabled" value="True" />
   <preference name="SuppressesIncrementalRendering" value="True" />
-  <plugin name="cordova-plugin-app-event" spec="1.1.0" source="pgb" />
-  <plugin name="cordova-plugin-splashscreen" spec="2.0.0" source="pgb" />
-  <plugin name="cordova-plugin-device" spec="1.1.0" source="pgb" />
-  <plugin name="cordova-plugin-network-information" spec="1.1.0" source="pgb" />
+  <plugin name="cordova-plugin-app-event" spec="1.1.0" source="npm" />
+  <plugin name="cordova-plugin-splashscreen" spec="2.0.0" source="npm" />
+  <plugin name="cordova-plugin-device" spec="1.1.0" source="npm" />
+  <plugin name="cordova-plugin-network-information" spec="1.1.0" source="npm" />
   <engine name="wp8" spec="~3.8.2" />
-  <plugin name="cordova-plugin-inappbrowser" spec="1.2.1" source="pgb" />
-  <plugin name="de.appplant.cordova.plugin.local-notification" spec="0.8.4" source="pgb" />
-  <plugin name="nl.x-services.plugins.socialsharing" spec="5.0.12" source="pgb" />
+  <plugin name="cordova-plugin-inappbrowser" spec="1.2.1" source="npm" />
+  <plugin name="de.appplant.cordova.plugin.local-notification" spec="0.8.4" source="npm" />
+  <plugin name="cordova-plugin-socialsharing" spec="5.0.12" source="npm" />
 </widget>
