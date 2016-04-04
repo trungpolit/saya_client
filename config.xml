@@ -11,7 +11,7 @@
   <vs:features />
   <preference name="SplashScreen" value="screen" />
   <preference name="windows-target-version" value="8.1" />
-  <plugin spec="https://github.com/apache/cordova-plugin-whitelist.git#1.2.0" source="git" />
+  <plugin name="cordova-plugin-whitelist" spec="~1" source="npm" />
   <allow-intent href="http://*/*" />
   <allow-intent href="https://*/*" />
   <allow-intent href="tel:*" />
