@@ -116,5 +116,5 @@
   <engine name="wp8" spec="~3.8.2" />
   <plugin name="cordova-plugin-inappbrowser" spec="1.2.1" source="npm" />
   <plugin name="de.appplant.cordova.plugin.local-notification" spec="0.8.4" source="npm" />
-  <plugin name="cordova-plugin-socialsharing" spec="5.0.12" source="npm" />
+  <plugin name="cordova-plugin-socialsharing" spec="4.3.81" source="npm" />
 </widget>
