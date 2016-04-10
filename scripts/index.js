@@ -485,6 +485,8 @@ saya.exitApp = function () {
 };
 saya.emptyCart = function () {
 
+    // thực hiện xóa dữ liệu carts nguyên gốc
+    localforage.removeItem('carts');
     // lấy ra các sản phẩm chứa trong giỏ hàng
     saya.cart.fetch({
         success: function (collection, response, options) {
@@ -1259,6 +1261,14 @@ saya.initialize = function () {
         localforage.setItem('is_vibrate', saya.is_vibrate);
     });
 
+    // thay đổi cỡ chữ
+    $('#font-slider').on('change', function () {
+
+        var value = $(this).val();
+        $('.font-content').css("font-size", value + "px !important");
+        console.log('change .font-content to ' + value);
+    });
+
     // lấy ra thông tin customer info
     localforage.getItem('customer_info', function (error, value) {
 
@@ -2026,6 +2036,12 @@ saya.initialize = function () {
                 // tăng +1 số lần hiện thị thông báo popup update
                 saya.open_update_popup_count += 1;
             }
+        } else if (page_id == 'checkout-page') {
+
+            //$.mobile.loading('show', {
+            //    text: "Đang xử lý...",
+            //    textVisible: true,
+            //});
         }
     });
 

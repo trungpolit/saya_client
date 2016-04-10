@@ -38,7 +38,7 @@
     font-family: 'Roboto';
 }
 
-input {
+input, textarea, select {
     -webkit-user-select: auto !important;
     -khtml-user-select: auto !important;
     -moz-user-select: auto !important;
@@ -126,7 +126,7 @@ span.tnmi {
 }
 
     .ui-icon-shop:after {
-        background-image: url("data:image/svg+xml;charset=US-ASCII,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22iso-8859-1%22%3F%3E%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%20%20width%3D%2228px%22%20height%3D%2228px%22%20viewBox%3D%220%200%2014%2014%22%20style%3D%22enable-background%3Anew%200%200%2014%2014%3B%22%20xml%3Aspace%3D%22preserve%22%3E%3Cpath%20style%3D%22fill%3A%2322aadd%3B%22%20d%3D%22M10%2C4V3c0-1.657-1.343-3-3-3S4%2C1.343%2C4%2C3v1H1v10h12V4H10z%20M4.5%2C6C4.224%2C6%2C4%2C5.776%2C4%2C5.5%20S4.224%2C5%2C4.5%2C5S5%2C5.224%2C5%2C5.5S4.776%2C6%2C4.5%2C6z%20M5%2C3c0-1.104%2C0.896-2%2C2-2c1.104%2C0%2C2%2C0.896%2C2%2C2v1H5V3z%20M9.5%2C6C9.225%2C6%2C9%2C5.776%2C9%2C5.5%20S9.225%2C5%2C9.5%2C5S10%2C5.224%2C10%2C5.5S9.775%2C6%2C9.5%2C6z%22%2F%3E%3C%2Fsvg%3E");
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2228%22%20height%3D%2228%22%20viewBox%3D%220%200%201792%201792%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20style%3D%22fill%3A%2322aadd%3B%22%20d%3D%22M1792%20768q53%200%2090.5%2037.5t37.5%2090.5-37.5%2090.5-90.5%2037.5h-15l-115%20662q-8%2046-44%2076t-82%2030h-1280q-46%200-82-30t-44-76l-115-662h-15q-53%200-90.5-37.5t-37.5-90.5%2037.5-90.5%2090.5-37.5h1792zm-1435%20800q26-2%2043.5-22.5t15.5-46.5l-32-416q-2-26-22.5-43.5t-46.5-15.5-43.5%2022.5-15.5%2046.5l32%20416q2%2025%2020.5%2042t43.5%2017h5zm411-64v-416q0-26-19-45t-45-19-45%2019-19%2045v416q0%2026%2019%2045t45%2019%2045-19%2019-45zm384%200v-416q0-26-19-45t-45-19-45%2019-19%2045v416q0%2026%2019%2045t45%2019%2045-19%2019-45zm352%205l32-416q2-26-15.5-46.5t-43.5-22.5-46.5%2015.5-22.5%2043.5l-32%20416q-2%2026%2015.5%2046.5t43.5%2022.5h5q25%200%2043.5-17t20.5-42zm-1156-1217l-93%20412h-132l101-441q19-88%2089-143.5t160-55.5h167q0-26%2019-45t45-19h384q26%200%2045%2019t19%2045h167q90%200%20160%2055.5t89%20143.5l101%20441h-132l-93-412q-11-44-45.5-72t-79.5-28h-167q0%2026-19%2045t-45%2019h-384q-26%200-45-19t-19-45h-167q-45%200-79.5%2028t-45.5%2072z%22%2F%3E%3C%2Fsvg%3E");
     }
 
 .ui-btn-active {
@@ -371,4 +371,20 @@ a.cart-item {
 
 #ads-description {
     font-weight:normal !important;
+}
+
+.ui-loader-background {
+    width:100%;
+    height:100%;
+    top:0;
+    padding: 0;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display:none;
+    position: fixed;
+    z-index: 9999;
+}
+
+.ui-loading .ui-loader-background {
+    display:block;
 }
