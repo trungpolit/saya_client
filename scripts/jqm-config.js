@@ -1,4 +1,8 @@
-﻿var deviceReadyDeferred = $.Deferred();
+﻿$(document).ready(function () {
+
+    saya.initFontSize();
+});
+var deviceReadyDeferred = $.Deferred();
 var jqmReadyDeferred = $.Deferred();
 saya.onDeviceReady = function () {
     deviceReadyDeferred.resolve();

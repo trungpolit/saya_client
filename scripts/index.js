@@ -80,6 +80,18 @@ saya.order_page = 0;
 saya.order_bundle_page = 0;
 saya.order_page_load = 0;
 saya.is_vibrate = ''; // chế độ rung?
+saya.font_size = 16; // cỡ font mặc định
+saya.initFontSize = function () {
+
+    localforage.getItem('font_size', function (err, value) {
+
+        if (value) {
+
+            saya.font_size = parseInt(value);
+            $('.font-content').addClass("font-size-" + value);
+        }
+    });
+};
 
 // Thiết lập giá trị mặc định settings, các thiết lập này sẽ bị ghi đè khi khởi động app
 saya.settings = {};
@@ -105,6 +117,7 @@ saya.settings.order_status_class = ["order-status-warning", "order-status-succes
 saya.settings.order_status_class_unknown = 'order-status-unknown';
 saya.settings.order_empty = 'Hiện tại, bạn chưa đặt bất cứ đơn hàng nào cả.';
 saya.settings.client_version_message = 'Đã có phiên bản ứng dụng mới với nhiều tính năng mới hấp dẫn và tiện dùng hơn. Bạn hãy cập nhật ngay nhé!';
+saya.settings.font_size = { min: 16, max: 20 };
 
 saya.caculateCartTotalPrice = function (cart) {
 
@@ -365,7 +378,7 @@ saya.fecthSetting = function () {
 
                     return;
                 }
-             
+
             });
         }
 
@@ -1262,11 +1275,19 @@ saya.initialize = function () {
     });
 
     // thay đổi cỡ chữ
-    $('#font-slider').on('change', function () {
+    $(document).on('change', '#font-range', function () {
 
+        var font_size_min = saya.settings.font_size.min;
+        var font_size_max = saya.settings.font_size.max;
+        for (var i = font_size_min; i <= font_size_max; i++) {
+
+            $('.font-content').removeClass("font-size-" + i)
+        }
         var value = $(this).val();
-        $('.font-content').css("font-size", value + "px !important");
+        saya.font_size = parseInt(value);
+        $('.font-content').addClass("font-size-" + value);
         console.log('change .font-content to ' + value);
+        localforage.setItem('font_size', saya.font_size);
     });
 
     // lấy ra thông tin customer info
@@ -2006,6 +2027,11 @@ saya.initialize = function () {
                     },
                 });
             }
+        } else if (page_id == 'setting-page') {
+
+            console.log('saya.font_size:' + saya.font_size);
+            $('#font-range').val(saya.font_size);
+            $('#font-range').trigger('change');
         }
     });
 
@@ -2067,7 +2093,7 @@ saya.onPause = function () {
     var sound = device.platform == 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
 
     cordova.plugins.notification.local.schedule({
-        id:1,
+        id: 1,
         text: saya.settings.notification_on_pause_message,
         at: timeout,
         led: "FF0000",
