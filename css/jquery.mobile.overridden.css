@@ -225,3 +225,10 @@
 		display: none;
 	}
 }
+.ui-panel-animate.ui-panel-page-content-position-right {
+  left: 0;
+  right: 0;
+  -webkit-transform: translate3d(-13em,0,0);
+  -moz-transform: translate3d(-13em,0,0);
+  transform: translate3d(-13em,0,0);
+}
