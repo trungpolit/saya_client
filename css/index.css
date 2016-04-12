@@ -46,9 +46,9 @@ input, textarea, select {
     user-select: auto !important;
 }
 
-body {
+/*body {
     overflow-x: hidden;
-}
+}*/
 
 .page-title {
     font-size: 1.8em;
