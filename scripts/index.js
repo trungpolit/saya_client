@@ -953,8 +953,10 @@ saya.ProductItemView = Backbone.View.extend({
                 // thực hiện kiểm tra nếu số lượng qty vượt quá số lượng qty cho phép thì thực hiện popup cảnh báo
                 if (new_qty > saya.settings.max_product_qty) {
 
-                    saya.openSystemPopup(saya.settings.add_cart_than_max);
-                    return false;
+                    //saya.openSystemPopup(saya.settings.add_cart_than_max);
+                    //return false;
+
+                    new_qty = parseInt(saya.settings.max_product_qty);
                 }
                 // thực hiện +1 vào qty
                 console.log('Carts had the item with id=' + item.id + ', increase item qty to ' + new_qty);
