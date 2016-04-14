@@ -473,18 +473,7 @@ saya.exitApp = function () {
     console.log('Empty cart before exit app!');
     saya.emptyCart();
 
-    var now = new Date().getTime(),
-    timeout = new Date(now + saya.settings.notification_on_exit_timeout * 1000);
-    var sound = device.platform == 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
-
-    cordova.plugins.notification.local.schedule({
-        id: 1,
-        text: saya.settings.notification_on_exit_message,
-        at: timeout,
-        led: "FF0000",
-        badge: 1,
-        sound: sound,
-    });
+    saya.setNotificationSchedule();
 
     console.log('Exit app');
     if (navigator.app) {
@@ -587,6 +576,33 @@ saya.emptyNotification = function () {
 
     $('.marquee').html('');
     $('.marquee').marquee('destroy');
+};
+saya.setNotificationSchedule = function () {
+
+    var now = new Date().getTime(),
+    timeout = new Date(now + saya.settings.notification_on_pause_timeout * 1000);
+    var sound = device.platform == 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
+
+    cordova.plugins.notification.local.schedule({
+        id: 1,
+        text: saya.settings.notification_on_pause_message,
+        at: timeout,
+        led: "FF0000",
+        badge: 1,
+        sound: sound,
+    });
+};
+saya.initializeForiOs = function(){
+
+    // xử lý dành riêng cho iOS
+    if (device.platform == 'iOS') {
+
+        $('.exit-app').hide();
+        console.log('Empty cart before exit app!');
+        saya.emptyCart();
+
+        saya.setNotificationSchedule();
+    }
 };
 
 saya.Setting = Backbone.Model.extend({
@@ -1215,11 +1231,8 @@ saya.initialize = function () {
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
 
-    // thực hiện ẩn nút thoát nếu là iOS
-    if (device.platform == 'iOS') {
-
-        $('.exit-app').hide();
-    }
+    // thiết lập dành riêng cho iOS
+    saya.initializeForiOs();
 
     $.ajaxSetup({ cache: false });
     $("#system-popup").enhanceWithin().popup();
@@ -2097,25 +2110,8 @@ saya.initialize = function () {
 
 saya.onPause = function () {
 
-    if (device.platform == 'iOS') {
-
-        console.log('Empty cart before exit app!');
-        saya.emptyCart();
-    }
-
     console.log('Pause event was trigger');
-    var now = new Date().getTime(),
-    timeout = new Date(now + saya.settings.notification_on_pause_timeout * 1000);
-    var sound = device.platform == 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
-
-    cordova.plugins.notification.local.schedule({
-        id: 1,
-        text: saya.settings.notification_on_pause_message,
-        at: timeout,
-        led: "FF0000",
-        badge: 1,
-        sound: sound,
-    });
+    saya.setNotificationSchedule();
 };
 
 saya.onResume = function () {
