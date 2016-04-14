@@ -1231,6 +1231,10 @@ saya.cart = new saya.CartCollection();
 
 saya.initialize = function () {
 
+    saya.settingPromise = saya.fetchSetting();
+    saya.initializePage();
+    saya.setCustomerId();
+
     FastClick.attach(document.body);
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
@@ -1348,10 +1352,6 @@ saya.initialize = function () {
 
         document.addEventListener("backbutton", saya.onBackKeyDown, false);
     }
-
-    saya.settingPromise = saya.fetchSetting();
-    saya.initializePage();
-    saya.setCustomerId();
 
     $('.exit-app').on('click', function () {
 
