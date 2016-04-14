@@ -523,6 +523,9 @@ saya.changeHomePage = function () {
     var $active_page = $(":mobile-pagecontainer").pagecontainer("getActivePage");
     var active_page_selector = $active_page.attr('id');
     console.log('active page is #' + active_page_selector);
+
+    console.log('fecthSetting is fecthing...');
+    saya.settingPromise = saya.fecthSetting();
     if (saya.region_id.length) {
 
         if (active_page_selector !== 'category-page') {
@@ -542,8 +545,7 @@ saya.changeHomePage = function () {
             $(":mobile-pagecontainer").pagecontainer("change", $('#region-page'), { transition: "slide" });
         } else {
 
-            console.log('#region-page is reloading &  fecthSetting is fecthing...');
-            saya.settingPromise = saya.fecthSetting();
+            console.log('#region-page is reloading');
             $(":mobile-pagecontainer").pagecontainer("change", $('#region-page'), { transition: "slide", allowSamePageTransition: true, changeHash: false });
         }
     }
@@ -1199,7 +1201,7 @@ saya.utli.getYearMonth = function () {
 };
 saya.utli.formatDateTime = function (str) {
 
-    var datestring = moment(str).format("DD/MM/YYYY HH:mm");
+    var datestring = moment(str, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm");
 
     return datestring;
 };
@@ -1212,6 +1214,12 @@ saya.initialize = function () {
     FastClick.attach(document.body);
     var key = 'abcxyz';
     var sound = device.platform == 'Android' ? 'file://beep.caf' : 'file://beep.caf';
+
+    // thực hiện ẩn nút thoát nếu là iOS
+    if (device.platform == 'iOS') {
+
+        $('.exit-app').hide();
+    }
 
     $.ajaxSetup({ cache: false });
     $("#system-popup").enhanceWithin().popup();
@@ -1822,8 +1830,8 @@ saya.initialize = function () {
                 var current_time = moment().valueOf();
                 _.each(notifications, function (item, index) {
 
-                    var begin_at = moment(item.begin_at).valueOf();
-                    var end_at = moment(item.end_at).valueOf();
+                    var begin_at = moment(item.begin_at, "YYYY-MM-DD HH:mm:ss").valueOf();
+                    var end_at = moment(item.end_at, "YYYY-MM-DD HH:mm:ss").valueOf();
                     if (current_time >= begin_at && current_time <= end_at) {
 
                         show_notifications.push(item);
@@ -1838,8 +1846,8 @@ saya.initialize = function () {
                 (function myLoop(i) {
 
                     var current_time = moment().valueOf();
-                    var begin_at = moment(show_notifications[i - 1].begin_at).valueOf();
-                    var end_at = moment(show_notifications[i - 1].end_at).valueOf();
+                    var begin_at = moment(show_notifications[i - 1].begin_at, "YYYY-MM-DD HH:mm:ss").valueOf();
+                    var end_at = moment(show_notifications[i - 1].end_at, "YYYY-MM-DD HH:mm:ss").valueOf();
                     if (current_time < begin_at || current_time > end_at) {
 
                         delete show_notifications[i - 1];
@@ -1857,8 +1865,8 @@ saya.initialize = function () {
                     }).bind('finished', function () {
                         $(this).marquee('destroy');
                         var current_time = moment().valueOf();
-                        var begin_at = moment(show_notifications[i - 1].begin_at).valueOf();
-                        var end_at = moment(show_notifications[i - 1].end_at).valueOf();
+                        var begin_at = moment(show_notifications[i - 1].begin_at, "YYYY-MM-DD HH:mm:ss").valueOf();
+                        var end_at = moment(show_notifications[i - 1].end_at, "YYYY-MM-DD HH:mm:ss").valueOf();
                         if (current_time < begin_at || current_time > end_at) {
 
                             delete show_notifications[i - 1];
@@ -2088,6 +2096,12 @@ saya.initialize = function () {
 };
 
 saya.onPause = function () {
+
+    if (device.platform == 'iOS') {
+
+        console.log('Empty cart before exit app!');
+        saya.emptyCart();
+    }
 
     console.log('Pause event was trigger');
     var now = new Date().getTime(),
