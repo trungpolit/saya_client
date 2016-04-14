@@ -152,7 +152,7 @@ saya.setCustomerId = function () {
         // saya.customer_id = '9f453cc6a651d89';
 
         // lấy thông tin về customer
-        saya.fecthCustomerDetail();
+        saya.fetchCustomerDetail();
     });
 };
 saya.openSystemPopup = function (message, timeout) {
@@ -327,15 +327,15 @@ saya.initializePage = function () {
         $.mobile.initializePage();
     });
 };
-saya.fecthSetting = function () {
+saya.fetchSetting = function () {
 
     $('body').spin();
     var deferred = $.Deferred();
     var setting = new saya.Setting();
-    var fecthSetting = setting.fetch();
-    fecthSetting.done(function (data, textStatus, jqXHR) {
+    var fetchSetting = setting.fetch();
+    fetchSetting.done(function (data, textStatus, jqXHR) {
 
-        console.log('fecthSetting was done, settings from sever:');
+        console.log('fetchSetting was done, settings from sever:');
         console.log(data);
         localforage.setItem('settings', data, function (err, value) {
 
@@ -395,21 +395,21 @@ saya.fecthSetting = function () {
         $('body').spin(false);
     });
 
-    fecthSetting.fail(function (jqXHR, textStatus, errorThrown) {
+    fetchSetting.fail(function (jqXHR, textStatus, errorThrown) {
 
-        console.log('fecthSetting was failed');
+        console.log('fetchSetting was failed');
         deferred.reject(errorThrown);
         $('body').spin(false);
     });
 
     return deferred.promise();
 };
-saya.fecthNotification = function () {
+saya.fetchNotification = function () {
 
     var deferred = $.Deferred();
     var notificationCollection = new saya.NotificationCollection();
-    var fecthNotification = notificationCollection.fetch();
-    fecthNotification.done(function (data, textStatus, jqXHR) {
+    var fetchNotification = notificationCollection.fetch();
+    fetchNotification.done(function (data, textStatus, jqXHR) {
 
         localforage.setItem('notifications', data, function (err, value) {
 
@@ -424,15 +424,15 @@ saya.fecthNotification = function () {
         });
     });
 
-    fecthNotification.fail(function (jqXHR, textStatus, errorThrown) {
+    fetchNotification.fail(function (jqXHR, textStatus, errorThrown) {
 
-        console.log('fecthNotification was failed');
+        console.log('fetchNotification was failed');
         deferred.reject(errorThrown);
     });
 
     return deferred.promise();
 };
-saya.fecthCustomerDetail = function () {
+saya.fetchCustomerDetail = function () {
 
     if (!saya.customer_id.length) {
 
@@ -441,16 +441,16 @@ saya.fecthCustomerDetail = function () {
 
     var url = saya.config.serviceDomain + saya.config.serviceRoot + saya.config.serviceCustomerDetail.path + saya.config.serviceCustomerDetail.pattern.replace('{customer_id}', saya.customer_id);
 
-    var fecth = $.get(url, {}, function (data) {
+    var fetch = $.get(url, {}, function (data) {
 
-        console.log('fecthCustomerDetail was successful, customer details:');
+        console.log('fetchCustomerDetail was successful, customer details:');
         console.log(data);
         saya.saveCustomerOrder(data);
     }, 'json');
 
-    fecth.fail(function (jqXHR, textStatus, errorThrown) {
+    fetch.fail(function (jqXHR, textStatus, errorThrown) {
 
-        console.log('fecthCustomerDetail was failed');
+        console.log('fetchCustomerDetail was failed');
     });
 };
 saya.saveCustomerOrder = function (data) {
@@ -513,8 +513,12 @@ saya.changeHomePage = function () {
     var active_page_selector = $active_page.attr('id');
     console.log('active page is #' + active_page_selector);
 
-    console.log('fecthSetting is fecthing...');
-    saya.settingPromise = saya.fecthSetting();
+    console.log('fetchSetting is re-fetching...');
+    saya.settingPromise = saya.fetchSetting();
+
+    console.log('setCustomerId is re-setting...');
+    saya.setCustomerId();
+
     if (saya.region_id.length) {
 
         if (active_page_selector !== 'category-page') {
@@ -1345,7 +1349,7 @@ saya.initialize = function () {
         document.addEventListener("backbutton", saya.onBackKeyDown, false);
     }
 
-    saya.settingPromise = saya.fecthSetting();
+    saya.settingPromise = saya.fetchSetting();
     saya.initializePage();
     saya.setCustomerId();
 
@@ -1815,9 +1819,9 @@ saya.initialize = function () {
             console.log('category-page: fetch and render remote data');
             $('body').spin();
             var categories = new saya.CategoryCollection();
-            var fecthCategories = categories.fetch();
+            var fetchCategories = categories.fetch();
             $toPage.find('#catgory-list').html('');
-            fecthCategories.done(function (data, textStatus, jqXHR) {
+            fetchCategories.done(function (data, textStatus, jqXHR) {
 
                 localforage.setItem('categories', data);
                 var categoryListView = new saya.CategoryListView({ collection: categories });
@@ -1827,7 +1831,7 @@ saya.initialize = function () {
                 $('body').spin(false);
             });
 
-            saya.notificationPromise = saya.fecthNotification();
+            saya.notificationPromise = saya.fetchNotification();
             saya.notificationPromise.done(function (notifications) {
 
                 console.log('notifications:');
@@ -1916,9 +1920,9 @@ saya.initialize = function () {
             console.log('product-page: fetch and render remote data');
             $('body').spin();
             var products = new saya.ProductCollection();
-            var fecthProducts = products.fetch();
+            var fetchProducts = products.fetch();
             $toPage.find('div[role="main"]').html('');
-            fecthProducts.done(function (data, textStatus, jqXHR) {
+            fetchProducts.done(function (data, textStatus, jqXHR) {
 
                 localforage.setItem('products', data);
                 if (data.length) {
@@ -1937,9 +1941,9 @@ saya.initialize = function () {
                 $('body').spin(false);
             });
 
-            fecthProducts.fail(function () {
+            fetchProducts.fail(function () {
 
-                console.log('fecthProducts was failed');
+                console.log('fetchProducts was failed');
                 $toPage.find('div[role="main"]').html(saya.settings.empty_product_in_region);
                 $toPage.trigger('create');
                 $('body').spin(false);
