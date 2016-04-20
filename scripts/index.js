@@ -1231,6 +1231,7 @@ saya.cart = new saya.CartCollection();
 
 saya.initialize = function () {
 
+    $.ajaxSetup({ cache: false });
     saya.settingPromise = saya.fetchSetting();
     saya.initializePage();
     saya.setCustomerId();
@@ -1242,7 +1243,6 @@ saya.initialize = function () {
     // thiết lập dành riêng cho iOS
     saya.initializeForiOs();
 
-    $.ajaxSetup({ cache: false });
     $("#system-popup").enhanceWithin().popup();
     $("#network-popup").enhanceWithin().popup();
 
