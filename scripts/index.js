@@ -1243,8 +1243,8 @@ saya.initialize = function () {
     // thiết lập dành riêng cho iOS
     saya.initializeForiOs();
 
-    $("#system-popup").enhanceWithin().popup();
-    $("#network-popup").enhanceWithin().popup();
+    //$("#system-popup").enhanceWithin().popup();
+    //$("#network-popup").enhanceWithin().popup();
 
     // lấy ra trạng thái bật/tắt rung
     localforage.getItem('is_vibrate', function (error, value) {
