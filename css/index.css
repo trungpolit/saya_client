@@ -46,13 +46,24 @@ input, textarea, select {
     user-select: auto !important;
 }
 
+@-ms-viewport {
+    width: auto !important;
+}
+
+html {
+    -ms-content-zooming: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+}
+
 body {
     overflow-x: hidden;
+    -ms-touch-action: pan-y;
 }
 
 .page-title {
     font-size: 1.8em;
-    color:#186031;
+    color: #186031;
 }
 
 span.vnitube {
@@ -321,29 +332,35 @@ a.cart-item {
 }
 
 .slogan-bottom {
-    font-weight:bold;
+    font-weight: bold;
     color: red;
 }
 
 .order-product-logo {
-    width:30% !important;
+    width: 30% !important;
 }
+
 .order-product-detail {
-    width:70% !important;
-    padding-left:5px;
+    width: 70% !important;
+    padding-left: 5px;
 }
+
 .order-total {
-    text-align:right;
+    text-align: right;
 }
+
 .order-status-success {
     color: #5cb85c;
 }
+
 .order-status-warning {
     color: #f0ad4e;
 }
+
 .order-status-info {
     color: #5bc0de;
 }
+
 .order-status-danger {
     color: #d9534f;
 }
@@ -351,12 +368,15 @@ a.cart-item {
 .order-status-success > a {
     color: #5cb85c !important;
 }
+
 .order-status-warning > a {
     color: #f0ad4e !important;
 }
+
 .order-status-info > a {
     color: #5bc0de !important;
 }
+
 .order-status-danger > a {
     color: #d9534f !important;
 }
@@ -370,23 +390,23 @@ a.cart-item {
 }
 
 #ads-description {
-    font-weight:normal !important;
+    font-weight: normal !important;
 }
 
 .ui-loader-background {
-    width:100%;
-    height:100%;
-    top:0;
+    width: 100%;
+    height: 100%;
+    top: 0;
     padding: 0;
     margin: 0;
     background: rgba(0, 0, 0, 0.3);
-    display:none;
+    display: none;
     position: fixed;
     z-index: 9999;
 }
 
 .ui-loading .ui-loader-background {
-    display:block;
+    display: block;
 }
 
 .font-size-17 {
