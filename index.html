@@ -18,24 +18,6 @@
     <link href="css/jquery.mobile.overridden.css" rel="stylesheet" />
     <link href="css/jqm-font-awesome/jqm-font-awesome-isvg-ipng.css" rel="stylesheet" />
     <link href="css/index.css" rel="stylesheet" />
-    <style>
-        * {
-            zoom: 1;
-        }
-
-        @-ms-viewport {
-            width: auto !important;
-        }
-
-        html {
-            /*overflow: hidden;*/
-            -ms-content-zooming: none;
-        }
-
-        body {
-            -ms-touch-action: pan-y;
-        }
-    </style>
 </head>
 <body>
     <div data-role="page" id="region-page" data-theme="a">
@@ -321,7 +303,7 @@
 
         <div data-role="footer" data-position="fixed" class="">
             <div data-role="navbar" data-iconpos="top">
-                <ul>
+                <ul style="list-style:none">
                     <li><a href="#checkout-confirm-cancel" data-icon="delete" class="checkout-cancel" data-rel="popup" data-transition="pop" data-position-to="window">Hủy bỏ</a></li>
                     <li><a href="#" data-icon="check" class="checkout-ok">Đặt hàng</a></li>
                 </ul>
