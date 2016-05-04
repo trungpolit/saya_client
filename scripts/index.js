@@ -586,15 +586,20 @@ saya.setNotificationSchedule = function () {
     var now = new Date().getTime(),
     timeout = new Date(now + saya.settings.notification_on_pause_timeout * 1000);
     var sound = device.platform == 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
-
-    cordova.plugins.notification.local.schedule({
+    var options = {
         id: 1,
         text: saya.settings.notification_on_pause_message,
         at: timeout,
-        led: "FF0000",
         badge: 1,
         sound: sound,
-    });
+    };
+
+    if (device.platform == 'Android') {
+
+        options.led = "FF0000";
+    }
+
+    cordova.plugins.notification.local.schedule(options);
 };
 saya.initializeForiOs = function(){
 
@@ -1345,7 +1350,7 @@ saya.initialize = function () {
         WinJS.Application.onbackclick = function (event) {
 
             // saya.onBackKeyDown();
-            return true; // This line is important, without it the app closes.
+            // return true; // This line is important, without it the app closes.
         }
     }
     else {
@@ -1795,6 +1800,8 @@ saya.initialize = function () {
                     var opts = '<option value="">Tỉnh/Thành phố</option>';
                     opts += saya.helper.renderOpts(region_parent);
                     $region_parent.html(opts);
+                    console.log('region-page: set select.region-parent value to ' + saya.region_parent_id);
+                    $region_parent.val(saya.region_parent_id);
                     $region_parent.selectmenu("refresh");
                     $region_parent.trigger('change');
                 });

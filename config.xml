@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<widget android-versionCode="19" defaultlocale="en-US" id="trungpolit.cordova.ongas" version="1.0.0" windows-packageVersion="1.0.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:vs="http://schemas.microsoft.com/appx/2014/htmlapps">
+<widget android-versionCode="21" defaultlocale="en-US" id="trungpolit.cordova.ongas" version="1.8.1" windows-packageVersion="1.8.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:vs="http://schemas.microsoft.com/appx/2014/htmlapps">
   <name>onGas</name>
   <description>onGas là một ứng dụng miễn phí.
 - Một cách cho người dùng tham khảo, hoặc mua hoặc bán online những mặt hàng thiết yếu phục vụ gia đình.
@@ -30,6 +30,8 @@
     <icon density="mdpi" src="res/icons/android/icon-48-mdpi.png" />
     <icon density="hdpi" src="res/icons/android/icon-72-hdpi.png" />
     <icon density="xhdpi" src="res/icons/android/icon-96-xhdpi.png" />
+    <icon density="xxhdpi" src="res/icons/android/icon-144-xxhdpi.png" />
+    <icon density="xxxhdpi" src="res/icons/android/icon-192-xxxhdpi.png" />
   </platform>
   <platform name="ios">
     <icon height="180" src="res/icons/ios/icon-60-3x.png" width="180" />
@@ -70,10 +72,14 @@
     <splash density="land-ldpi" src="res/screens/android/screen-ldpi-landscape.png" />
     <splash density="land-mdpi" src="res/screens/android/screen-mdpi-landscape.png" />
     <splash density="land-xhdpi" src="res/screens/android/screen-xhdpi-landscape.png" />
+    <splash density="land-xxhdpi" src="res/screens/android/screen-xxhdpi-landscape.png" />
+    <splash density="land-xxxhdpi" src="res/screens/android/screen-xxxhdpi-landscape.png" />
     <splash density="port-hdpi" src="res/screens/android/screen-hdpi-portrait.png" />
     <splash density="port-ldpi" src="res/screens/android/screen-ldpi-portrait.png" />
     <splash density="port-mdpi" src="res/screens/android/screen-mdpi-portrait.png" />
     <splash density="port-xhdpi" src="res/screens/android/screen-xhdpi-portrait.png" />
+    <splash density="port-xxhdpi" src="res/screens/android/screen-xxhdpi-portrait.png" />
+    <splash density="port-xxxhdpi" src="res/screens/android/screen-xxxhdpi-portrait.png" />
   </platform>
   <platform name="ios">
     <splash height="480" src="res/screens/ios/screen-iphone-portrait.png" width="320" />
@@ -98,7 +104,7 @@
   <preference name="Orientation" value="default" />
   <preference name="exit-on-suspend" value="true" />
   <vs:platformSpecificValues>
-    <vs:platformSpecificWidget id="trungpolit.cordova.ongas" platformName="windows" version="1.0.0.0">
+    <vs:platformSpecificWidget id="trungpolit.cordova.ongas" platformName="windows" version="1.8.1.0">
       <vs:name>onGas</vs:name>
     </vs:platformSpecificWidget>
   </vs:platformSpecificValues>
