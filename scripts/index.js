@@ -81,6 +81,7 @@ saya.order_bundle_page = 0;
 saya.order_page_load = 0;
 saya.is_vibrate = ''; // chế độ rung?
 saya.font_size = 16; // cỡ font mặc định
+saya.homepage = '#region-page';
 saya.initFontSize = function () {
 
     localforage.getItem('font_size', function (err, value) {
@@ -289,6 +290,7 @@ saya.initializePage = function () {
 
             console.log('navigate to #category-page');
             window.location.hash = '#category-page';
+            saya.homepage = '#category-page';
 
             console.log('get data from localforage.region_submit:');
             console.log(value);
@@ -322,6 +324,7 @@ saya.initializePage = function () {
 
             console.log('navigate to #region-page');
             window.location.hash = '#region-page';
+            saya.homepage = '#region-page';
         }
 
         $.mobile.initializePage();
@@ -1350,7 +1353,16 @@ saya.initialize = function () {
         WinJS.Application.onbackclick = function (event) {
 
             // saya.onBackKeyDown();
-            // return true; // This line is important, without it the app closes.
+           
+            var currentHash = window.location.hash;
+            console.log('currentHash: ' + currentHash);
+            if (currentHash == saya.homepage) {
+
+                window.close();
+            }
+
+            window.history.back();
+            return true;
         }
     }
     else {
