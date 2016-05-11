@@ -119,6 +119,7 @@ saya.settings.order_status_class_unknown = 'order-status-unknown';
 saya.settings.order_empty = 'Hiện tại, bạn chưa đặt bất cứ đơn hàng nào cả.';
 saya.settings.client_version_message = 'Đã có phiên bản ứng dụng mới với nhiều tính năng mới hấp dẫn và tiện dùng hơn. Bạn hãy cập nhật ngay nhé!';
 saya.settings.font_size = { min: 16, max: 20 };
+saya.settings.notification_ios_version_supported = 8.0;
 
 saya.caculateCartTotalPrice = function (cart) {
 
@@ -585,6 +586,11 @@ saya.emptyNotification = function () {
 };
 saya.setNotificationSchedule = function () {
 
+    // kiểm tra nếu platform là iOS, và có version nhỏ hơn 8.0 thì không thực hiện set notification vì không hỗ trợ
+    if (device.platform == 'iOS' && parseFloat(device.version) < saya.settings.notification_ios_version_supported) {
+
+        return;
+    }
     var now = new Date().getTime(),
     timeout = new Date(now + saya.settings.notification_on_pause_timeout * 1000);
     var sound = device.platform == 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
