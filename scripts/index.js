@@ -281,7 +281,6 @@ saya.updateRegionSubmit = function (parent_name, child_name) {
     localforage.setItem('region_submit', region_submit);
 };
 saya.initializePage = function () {
-
     // thực hiện điều hướng sang #category-page nếu đã được thiết lập region_submit
     console.log('Check whether navigate to #region-page or #category-page');
     localforage.getItem('region_submit', function (err, value) {
@@ -1238,6 +1237,12 @@ saya.utli.formatDateTime = function (str) {
 saya.cart = new saya.CartCollection();
 
 saya.initialize = function () {
+
+    // ẩn menu điều khoản đối với platform không phải Windows hay Windowsphone
+    if (device.platform != 'WinCE' && device.platform != 'Win32NT') {
+
+        $('.privacy').hide();
+    }
 
     $.ajaxSetup({ cache: false });
     saya.settingPromise = saya.fetchSetting();
