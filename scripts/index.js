@@ -15,8 +15,8 @@ var saya = {};
 saya.config = {
     //serviceDomain: "http://cms.goga.mobi/",
     //serviceDomain: "http://ongas.cms/",
-    //serviceDomain: "http://192.168.5.151/saya_backend/",
-    serviceDomain: "http://cms.ongas.vn/",
+    serviceDomain: "http://localhost/saya_backend/",
+    //serviceDomain: "http://cms.ongas.vn/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
         name: 'settings.json',
@@ -25,7 +25,8 @@ saya.config = {
         name: 'regions.json',
     },
     serviceCategory: {
-        name: 'categories.json',
+        path: 'categories/',
+        pattern: '{region_id}.json',
     },
     serviceProduct: {
         path: 'products/',
@@ -36,7 +37,7 @@ saya.config = {
         pattern: '{region_id}_{year_month}.json',
     },
     serviceOrder: {
-        path: 'orders_bundles/',
+        path: 'orders_distributors/',
         pattern: '{customer_id}/{page}.json',
     },
     serviceOrderCreate: {
@@ -74,10 +75,10 @@ saya.customer_info = {};
 saya.product_expand = '';
 saya.cart_item_remove = {};
 saya.total_order = 0;
-saya.total_order_bundle = 0;
+saya.total_order_distributor = 0;
 saya.order_page_limit = 5;
 saya.order_page = 0;
-saya.order_bundle_page = 0;
+saya.order_distributor_page = 0;
 saya.order_page_load = 0;
 saya.is_vibrate = ''; // chế độ rung?
 saya.font_size = 16; // cỡ font mặc định
@@ -120,6 +121,8 @@ saya.settings.order_empty = 'Hiện tại, bạn chưa đặt bất cứ đơn h
 saya.settings.client_version_message = 'Đã có phiên bản ứng dụng mới với nhiều tính năng mới hấp dẫn và tiện dùng hơn. Bạn hãy cập nhật ngay nhé!';
 saya.settings.font_size = { min: 16, max: 20 };
 saya.settings.notification_ios_version_supported = 8.0;
+saya.settings.category_welcome = { "enable": 1, "text": "Mời đăng sản phẩm", color: "#3388cc", bg_hover_color: "#0047ab", "logo_path": "http://localhost/saya_backend/img/contact.png" };
+saya.settings.category_welcome_content = "";
 
 saya.caculateCartTotalPrice = function (cart) {
 
@@ -459,17 +462,17 @@ saya.fetchCustomerDetail = function () {
 saya.saveCustomerOrder = function (data) {
 
     saya.total_order = data.total_order;
-    saya.total_order_bundle = data.total_order_bundle;
+    saya.total_order_distributor = data.total_order_distributor;
 
     // tính toán page dựa vào total và limit
     saya.order_page = Math.ceil(saya.total_order / saya.order_page_limit);
-    saya.order_bundle_page = Math.ceil(saya.total_order_bundle / saya.order_page_limit);
+    saya.order_distributor_page = Math.ceil(saya.total_order_distributor / saya.order_page_limit);
 
     // thực hiện ghi lại thông tin
     localforage.setItem('total_order', data.total_order);
-    localforage.setItem('total_order_bundle', data.total_order_bundle);
+    localforage.setItem('total_order_distributor', data.total_order_distributor);
     localforage.setItem('order_page', saya.order_page);
-    localforage.setItem('order_bundle_page', saya.order_bundle_page);
+    localforage.setItem('order_distributor_page', saya.order_distributor_page);
 };
 saya.exitApp = function () {
 
@@ -680,7 +683,10 @@ saya.CategoryCollection = Backbone.Collection.extend({
     model: saya.Category,
     url: function () {
 
-        return this.config.serviceDomain + this.config.serviceRoot + this.config.serviceCategory.name;
+        this.config.serviceCategory.name = this.config.serviceCategory.pattern.replace('{region_id}', saya.region_id);
+        var url = this.config.serviceDomain + this.config.serviceRoot + this.config.serviceCategory.path + this.config.serviceCategory.name;
+        console.log('CategoryCollection: fetch remote data from "' + url + '"');
+        return url;
     },
 });
 
@@ -729,7 +735,7 @@ saya.OrderCollection = Backbone.Collection.extend({
             this.page = options.page;
         } else {
 
-            this.page = saya.order_bundle_page;
+            this.page = saya.order_distributor_page;
         }
     },
     model: saya.Order,
@@ -752,6 +758,12 @@ saya.CategoryListView = Backbone.View.extend({
             var categoryItem = new saya.CategoryItemView({ model: model, index: index });
             self.$el.append(categoryItem.el);
         });
+
+       if (saya.settings.category_welcome.enable) {
+            console.log('Append Category Welcome');
+            var categoryWelcomeItem = new saya.CategoryWelcomeItemView();
+            self.$el.append(categoryWelcomeItem.el);
+        }
 
         return this;
     },
@@ -895,6 +907,23 @@ saya.CategoryItemView = Backbone.View.extend({
     },
 });
 
+saya.CategoryWelcomeItemView = Backbone.View.extend({
+    tagName: 'li',
+    template: _.template('<a href="#welcome-page" data-transition="slide"><img src="<%= logo_path %>" class="ui-li-thumb"><h2 style="color:<%= color %>"><%= text %></h2></a>'),
+    initialize: function (options) {
+        this.options = options;
+        _.bindAll(this, 'render');
+        this.render();
+    },
+    render: function () {
+        var variables = saya.settings.category_welcome;
+        var template = this.template(variables);
+
+        this.$el.html(template);
+        return this;
+    },
+});
+
 saya.ProductItemView = Backbone.View.extend({
     tagName: 'li',
     template: _.template($('#product-item-tpl').html()),
@@ -914,6 +943,17 @@ saya.ProductItemView = Backbone.View.extend({
         var logo_uri = _.isArray(this.model.get('logo_uri')) ? this.model.get('logo_uri')[0] : '';
         variables.logo_path = saya.config.serviceDomain + logo_uri;
 
+        // thực hiện điền domain vào thumb_uri
+        var thumb_uri = _.isArray(this.model.get('thumb_uri')) ? this.model.get('thumb_uri') : '';
+        if (!_.isEmpty(thumb_uri)) {
+            thumb_uri = _.map(thumb_uri, function (value) {
+                return saya.config.serviceDomain + value;
+            });
+            variables.thumb_path = _.escape(JSON.stringify(thumb_uri));
+        } else {
+            variables.thumb_path = '';
+        }
+
         variables.serialize = _.escape(JSON.stringify(variables));
         variables.price = saya.utli.numberFormat(parseFloat(variables.price));
 
@@ -928,6 +968,7 @@ saya.ProductItemView = Backbone.View.extend({
     events: {
         "click .cart": "onCartButtonClick",
         "click a.product-item": "onProductItemClick",
+        "click img.product-logo": "onProductLogoClick",
     },
     onProductItemClick: function (event) {
 
@@ -1001,6 +1042,56 @@ saya.ProductItemView = Backbone.View.extend({
                 });
             },
         });
+    },
+    onProductLogoClick: function (event) {
+
+        console.log('Tap on product logo image was trigger');
+        var $self = $(event.currentTarget);
+        var thumb_path = $self.data('thumb_path');
+        console.log('list thumb_path of product:');
+        console.log(thumb_path);
+
+        if (!_.isEmpty(thumb_path)) {
+
+            var pswpElement = document.querySelectorAll('.pswp')[0];
+            console.log('Build thumb gallery');
+            // build items array
+            var items = _.map(thumb_path, function (path) {
+                return {
+                    src: path,
+                    w: 0,
+                    h:0,
+                };
+            });
+
+            // define options (if needed)
+            var options = {
+                // history & focus options are disabled on CodePen        
+                history: false,
+                focus: false,
+
+                showAnimationDuration: 0,
+                hideAnimationDuration: 0
+
+            };
+
+            var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
+            gallery.listen('gettingData', function (index, item) {
+                if (item.w < 1 || item.h < 1) { // unknown size
+                    var img = new Image();
+                    img.onload = function () { // will get size after load
+                        item.w = this.width; // set image width
+                        item.h = this.height; // set image height
+                        gallery.invalidateCurrItems(); // reinit Items
+                        gallery.updateSize(true); // reinit Items
+                    }
+                    img.src = item.src; // let's download image
+                }
+            });
+            gallery.init();
+        }
+
+        return false;
     },
     changeCartPage: function () {
 
@@ -1655,7 +1746,7 @@ saya.initialize = function () {
                 return false;
             }
 
-            if (saya.order_bundle_page <= 0) {
+            if (saya.order_distributor_page <= 0) {
 
                 console.log('Have no any order to load.');
                 return false;
@@ -2056,14 +2147,14 @@ saya.initialize = function () {
 
             console.log('order-page: render data');
             // nếu Lịch sử đơn hàng rỗng, hiện thị message
-            if (saya.order_bundle_page <= 0) {
+            if (saya.order_distributor_page <= 0) {
 
                 $('#order-list').html(saya.settings.order_empty);
             } else {
 
-                console.log('reset saya.order_page_load = saya.order_bundle_page = ' + saya.order_bundle_page);
+                console.log('reset saya.order_page_load = saya.order_distributor_page = ' + saya.order_distributor_page);
                 $('body').spin();
-                saya.order_page_load = saya.order_bundle_page;
+                saya.order_page_load = saya.order_distributor_page;
 
                 var orderCollection = new saya.OrderCollection();
                 orderCollection.fetch({
@@ -2089,6 +2180,9 @@ saya.initialize = function () {
             console.log('saya.font_size:' + saya.font_size);
             $('#font-range').val(saya.font_size);
             $('#font-range').trigger('change');
+        } else if (page_id == 'welcome-page') {
+
+            $toPage.find('.ui-content').html(saya.settings.category_welcome_content);
         }
     });
 

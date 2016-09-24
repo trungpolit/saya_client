@@ -17,6 +17,8 @@
     <link href="css/libs/jquery.mobile.structure-1.4.5.css" rel="stylesheet" />-->
     <link href="css/jquery.mobile.overridden.css" rel="stylesheet" />
     <link href="css/jqm-font-awesome/jqm-font-awesome-isvg-ipng.css" rel="stylesheet" />
+    <link href="css/libs/photoswipe.css" rel="stylesheet" />
+    <link href="css/libs/default-skin/default-skin.css" rel="stylesheet" />
     <link href="css/index.css" rel="stylesheet" />
 </head>
 <body>
@@ -670,6 +672,52 @@
         </div>
     </div>
 
+    <div data-role="page" id="welcome-page" data-theme="a">
+        <div data-role="header" data-position="fixed">
+            <h1 class="header-title">
+                <span class="page-title">
+                    <span class="vnitube">o</span><span class="vnitube">n</span><span class="lmt">G</span><span class="lmt">a</span><span class="lmt">s</span>
+                </span>
+            </h1>
+            <a href="#" data-direction="reverse" data-iconpos="notext" data-rel="back" data-icon="arrow-l" class="icon-zoom">Back</a>
+            <a href="#setting-panel" data-icon="grid" data-iconpos="notext" class="icon-zoom">Menu</a>
+        </div>
+
+        <div role="main" class="ui-content font-content">
+      
+        </div>
+
+        <div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="setting-panel" data-position="right" data-classes='{"modal":"needsclick ui-panel-dismiss"}'>
+            <ul data-role="listview">
+                <li class="customer-welcome font-content" data-rel="close">&nbsp;</li>
+                <li class="font-content"><a href="#category-page" data-transition="slide" class="menu">Sản phẩm</a></li>
+                <li class="font-content"><a href="#cart-page" data-transition="slide" class="menu">Giỏ hàng</a></li>
+                <li class="font-content"><a href="#order-page" data-transition="slide" class="menu">Lịch sử đơn hàng</a></li>
+                <li class="font-content"><a href="#region-edit-page" data-transition="slide" class="menu">Địa chỉ</a></li>
+                <li class="font-content"><a href="#link-page" data-transition="slide" class="menu">Liên kết</a></li>
+                <li class="font-content"><a href="#about-page" data-transition="slide" class="menu">Giới thiệu</a></li>
+                <li class="font-content"><a href="#setting-page" data-transition="slide" class="menu">Cài đặt</a></li>
+                <li class="font-content"><a href="http://ongas.vn/dieukhoan.html" class="menu privacy">Điều khoản</a></li>
+                <li class="font-content"><a href="#exit-app" class="exit-app">Thoát</a></li>
+                <li class="slogan">
+                    <div style="text-align:center">
+                        <h1 class="header-title">
+                            <span class="page-title">
+                                <span class="vnitube">o</span><span class="vnitube">n</span><span class="lmt">G</span><span class="lmt">a</span><span class="lmt">s</span>
+                            </span>
+                        </h1>
+                        <span class="slogan-bottom">
+                            <span class="spr">k</span><span class="tnmi">ế</span><span class="spr">t</span>
+                            <span class="spr">n</span><span class="tnmi">ố</span><span class="spr">i</span>
+                            <span class="spr">n</span><span class="spr">i</span><span class="tnmi">ề</span><span class="spr">m</span>
+                            <span class="spr">t</span><span class="tnmi">i</span><span class="spr">n</span>
+                        </span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
     <div class="font-content" id="system-popup" data-theme="a" data-role="popup">
         <div id="system-popup-content" class="ui-content"></div>
     </div>
@@ -684,7 +732,7 @@
         <a class="ui-btn ui-btn-icon-bottom ui-icon-carat-d product-item">
             <div class="ui-grid-a">
                 <div class="ui-block-a">
-                    <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo inline-block" />
+                    <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo inline-block" data-thumb_path='<%= thumb_path %>' />
                     <div class="inline-block">
                         <h2><%= name %></h2>
                         <p class="product-price">Giá: <%= price %>/<%= unit %></p>
@@ -776,6 +824,71 @@
         </div>
     </script>
 
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+        <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+        <div class="pswp__bg"></div>
+
+        <!-- Slides wrapper with overflow:hidden. -->
+        <div class="pswp__scroll-wrap">
+
+            <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+            <div class="pswp__container">
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+            </div>
+
+            <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+            <div class="pswp__ui pswp__ui--hidden">
+
+                <div class="pswp__top-bar">
+
+                    <!--  Controls are self-explanatory. Order can be changed. -->
+
+                    <div class="pswp__counter"></div>
+
+                    <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                    <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                    <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                    <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                    <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                    <!-- element will get class pswp__preloader--active when preloader is running -->
+                    <div class="pswp__preloader">
+                        <div class="pswp__preloader__icn">
+                            <div class="pswp__preloader__cut">
+                                <div class="pswp__preloader__donut"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                    <div class="pswp__share-tooltip"></div>
+                </div>
+
+                <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+                <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+                <div class="pswp__caption">
+                    <div class="pswp__caption__center"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
     <!--<script src="http://192.168.5.147:1337/vorlon.js"></script>-->
     <script>
         window.onerror = function (errorMsg, url, lineNumber) {
@@ -795,7 +908,44 @@
     <script src="scripts/index.js"></script>
     <script src="scripts/jqm-config.js"></script>
     <script src="scripts/libs/jquery.mobile-1.4.5.js"></script>
+    <script src="scripts/libs/photoswipe.min.js"></script>
+    <script src="scripts/libs/photoswipe-ui-default.min.js"></script>
     <script src="scripts/platformOverrides.js"></script>
+    <script>
+        //var openPhotoSwipe = function() {
+        //    var pswpElement = document.querySelectorAll('.pswp')[0];
+
+        //    // build items array
+        //    var items = [
+        //        {
+        //            src: 'https://farm2.staticflickr.com/1043/5186867718_06b2e9e551_b.jpg',
+        //            w: 964,
+        //            h: 1024
+        //        },
+        //        {
+        //            src: 'https://farm7.staticflickr.com/6175/6176698785_7dee72237e_b.jpg',
+        //            w: 1024,
+        //            h: 683
+        //        }
+        //    ];
+    
+        //    // define options (if needed)
+        //    var options = {
+        //        // history & focus options are disabled on CodePen        
+        //        history: false,
+        //        focus: false,
+
+        //        showAnimationDuration: 0,
+        //        hideAnimationDuration: 0
+        
+        //    };
+    
+        //    var gallery = new PhotoSwipe( pswpElement, PhotoSwipeUI_Default, items, options);
+        //    gallery.init();
+        //};
+
+        //openPhotoSwipe();
+    </script>
     <script src="cordova.js"></script>
 </body>
 </html>
