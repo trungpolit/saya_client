@@ -15,7 +15,8 @@ var saya = {};
 saya.config = {
     //serviceDomain: "http://cms.goga.mobi/",
     //serviceDomain: "http://ongas.cms/",
-    serviceDomain: "http://localhost/saya_backend/",
+   // serviceDomain: "http://localhost/saya_backend/",
+    serviceDomain: "http://192.168.207.1/saya_backend/",
     //serviceDomain: "http://cms.ongas.vn/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
@@ -121,7 +122,7 @@ saya.settings.order_empty = 'Hiện tại, bạn chưa đặt bất cứ đơn h
 saya.settings.client_version_message = 'Đã có phiên bản ứng dụng mới với nhiều tính năng mới hấp dẫn và tiện dùng hơn. Bạn hãy cập nhật ngay nhé!';
 saya.settings.font_size = { min: 16, max: 20 };
 saya.settings.notification_ios_version_supported = 8.0;
-saya.settings.category_welcome = { "enable": 1, "text": "Mời đăng sản phẩm", color: "#3388cc", bg_hover_color: "#0047ab", "logo_path": "http://localhost/saya_backend/img/contact.png" };
+saya.settings.category_welcome = { "enable": 1, "text": "Mời đăng sản phẩm", color: "#3388cc", bg_hover_color: "#0047ab", "logo_path": saya.config.serviceDomain+"img/contact.png" };
 saya.settings.category_welcome_content = "";
 
 saya.caculateCartTotalPrice = function (cart) {
@@ -359,7 +360,21 @@ saya.fetchSetting = function () {
         _.each(data, function (value, key) {
 
             console.log('override saya.settings.' + key + ' from server');
-            saya.settings[key] = value;
+            // Thực hiện kiểm tra key có phải là path không để điền vào domain
+            if (key.search('_path') !== -1 && _.isString(value)) {
+                saya.settings[key] = saya.config.serviceDomain + value;
+            } else if (_.isObject(value) && !_.isArray(value)) {
+                saya.settings[key] = _.mapObject(value, function (v, k) {
+                    
+                    if (k.search('_path') !== -1 && _.isString(v)) {
+                        return saya.config.serviceDomain + v;
+                    } else {
+                        return v;
+                    }
+                });
+            } else {
+                saya.settings[key] = value;
+            }
             console.log('saya.settings.' + key + ' was overridden to:');
             console.log(saya.settings[key]);
         });

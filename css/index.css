@@ -440,3 +440,8 @@ a.cart-item {
 .font-size-20 * {
     font-size: 20px !important;
 }
+
+.description img {
+    width:100% !important;
+    height:auto !important;
+}
