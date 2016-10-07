@@ -15,9 +15,9 @@ var saya = {};
 saya.config = {
     //serviceDomain: "http://cms.goga.mobi/",
     //serviceDomain: "http://ongas.cms/",
-   // serviceDomain: "http://localhost/saya_backend/",
-   // serviceDomain: "http://192.168.137.1/saya_backend/",
-    serviceDomain: "http://cms.ongas.vn/",
+    serviceDomain: "http://localhost/saya_backend/",
+    // serviceDomain: "http://192.168.137.1/saya_backend/",
+    // serviceDomain: "http://cms.ongas.vn/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
         name: 'settings.json',
@@ -1680,6 +1680,8 @@ saya.initialize = function () {
         };
         order.region_id = saya.region_id;
         order.region_name = saya.region_name;
+        order.region_parent_id = saya.region_parent_id;
+        order.region_parent_name = saya.region_parent_name;
         order.platform_os = device.platform;
         order.platform_version = device.version;
 
