@@ -2188,6 +2188,10 @@ saya.initialize = function () {
                             $(window).trigger('scrollstop');
                         }
                     },
+                    error: function () {
+                        $('#order-list').html(saya.settings.order_empty);
+                        $('body').spin(false);
+                    },
                 });
             }
         } else if (page_id == 'setting-page') {
