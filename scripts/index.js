@@ -784,6 +784,20 @@ saya.CategoryListView = Backbone.View.extend({
     },
 });
 
+saya.CategoryWelcomeListView = Backbone.View.extend({
+    el: '<ul data-role="listview" data-inset="true" />',
+    render: function () {
+        var self = this;
+        if (saya.settings.category_welcome.enable) {
+            console.log('Append Category Welcome');
+            var categoryWelcomeItem = new saya.CategoryWelcomeItemView();
+            self.$el.append(categoryWelcomeItem.el);
+        }
+
+        return this;
+    },
+});
+
 saya.ProductListView = Backbone.View.extend({
     el: '<ul data-role="listview" data-inset="true" />',
     render: function () {
@@ -1967,6 +1981,20 @@ saya.initialize = function () {
                 $('body').spin(false);
             });
 
+            fetchCategories.fail(function (jqXHR, textStatus, errorThrown) {
+                console.log('category-page: fetch data was failed');
+                console.log(jqXHR);
+                if (jqXHR.status === 404) {
+                    console.log('Append Welcome List View');
+                    var categoryWelcomeListView = new saya.CategoryWelcomeListView();
+                    var categoryWelcomeListHtml = categoryWelcomeListView.render();
+                    $toPage.find('#catgory-list').append(categoryWelcomeListHtml.el);
+                    $toPage.find('ul[data-role="listview"]').listview();
+                }
+             
+                $('body').spin(false);
+            });
+
             saya.notificationPromise = saya.fetchNotification();
             saya.notificationPromise.done(function (notifications) {
 
@@ -2078,7 +2106,6 @@ saya.initialize = function () {
             });
 
             fetchProducts.fail(function () {
-
                 console.log('fetchProducts was failed');
                 $toPage.find('div[role="main"]').html(saya.settings.empty_product_in_region);
                 $toPage.trigger('create');
@@ -2175,7 +2202,7 @@ saya.initialize = function () {
                 orderCollection.fetch({
                     cache: false,
                     success: function (collection, response, options) {
-
+                        console.log('fetchOrderCollection  was successful');
                         var orderListView = new saya.OrderListView({ collection: collection });
                         orderListView.render();
 
@@ -2184,12 +2211,14 @@ saya.initialize = function () {
                         $('body').spin(false);
 
                         if ($("#order-list").outerHeight() <= $(window).height()) {
-
                             $(window).trigger('scrollstop');
                         }
                     },
-                    error: function () {
-                        $('#order-list').html(saya.settings.order_empty);
+                    fail: function (jqXHR, textStatus, errorThrown) {
+                        console.log('fetchOrderCollection was failed');
+                        if (jqXHR.status === 404) {
+                            $('#order-list').html(saya.settings.order_empty);
+                        }
                         $('body').spin(false);
                     },
                 });
