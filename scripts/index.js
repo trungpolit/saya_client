@@ -16,37 +16,37 @@ saya.config = {
     //serviceDomain: "http://cms.goga.mobi/",
     //serviceDomain: "http://ongas.cms/",
     //serviceDomain: "http://localhost/saya_backend/",
-    // serviceDomain: "http://192.168.137.1/saya_backend/",
+    //serviceDomain: "http://192.168.137.1/saya_backend/",
     serviceDomain: "http://cms.ongas.vn/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
-        name: 'settings.json',
+        name: 'settings.gz',
     },
     serviceRegion: {
-        name: 'regions.json',
+        name: 'regions.gz',
     },
     serviceCategory: {
         path: 'categories/',
-        pattern: '{region_id}.json',
+        pattern: '{region_id}.gz',
     },
     serviceProduct: {
         path: 'products/',
-        pattern: '{region_id}_{category_id}.json',
+        pattern: '{region_id}_{category_id}.gz',
     },
     serviceNotification: {
         path: 'notifications/',
-        pattern: '{region_id}_{year_month}.json',
+        pattern: '{region_id}_{year_month}.gz',
     },
     serviceOrder: {
         path: 'orders_distributors/',
-        pattern: '{customer_id}/{page}.json',
+        pattern: '{customer_id}/{page}.gz',
     },
     serviceOrderCreate: {
         path: 'OrderServices/create',
     },
     serviceCustomerDetail: {
         path: 'customers/',
-        pattern: '{customer_id}.json',
+        pattern: '{customer_id}.gz',
     },
     serviceFeedbackCreate: {
         path: 'FeedbackServices/create',
@@ -417,7 +417,6 @@ saya.fetchSetting = function () {
     });
 
     fetchSetting.fail(function (jqXHR, textStatus, errorThrown) {
-
         console.log('fetchSetting was failed');
         deferred.reject(errorThrown);
         $('body').spin(false);

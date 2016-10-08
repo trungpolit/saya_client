@@ -10,23 +10,13 @@
 }
 
 @font-face {
-    font-family: 'VNI-Tubes';
-    src: url('fonts/VNI-Tubes.ttf') format('truetype');
+    font-family: 'HARLOWSI';
+    src: url('fonts/HARLOWSI.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'Levenim-MT-Regular';
-    src: url('fonts/Levenim-MT-Regular.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'Segoe-Print-Regular';
-    src: url('fonts/Segoe-Print-Regular.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'Times-New-Roman-Italic';
-    src: url('fonts/Times-New-Roman-Italic.ttf') format('truetype');
+    font-family: 'UTM-Mobifone-KT';
+    src: url('fonts/UTM-Mobifone-KT.ttf') format('truetype');
 }
 
 * {
@@ -62,8 +52,26 @@ body {
 }
 
 .page-title {
-    font-size: 1.8em;
-    color: #186031;
+    font-size: 1.6em;
+    color:#3388cc;
+}
+
+span.harlowsi-header {
+    font-family: HARLOWSI;
+    font-size: 1.5em;
+    line-height: 0px;
+    font-weight: 100;
+}
+
+span.harlowsi {
+    font-family: HARLOWSI;
+    font-size: 1.5em;
+    font-weight: 100;
+}
+
+span.utm {
+    font-family: UTM-Mobifone-KT;
+    font-weight: 100;
 }
 
 span.vnitube {
@@ -100,8 +108,8 @@ span.tnmi {
     .icon-scale:after {
         height: 3.6em !important;
         width: 3.6em !important;
-        margin-left: -1.8em;
-        margin-top: -1.8em;
+        margin-left: -1.6em;
+        margin-top: -1.6em;
     }
 
 .icon-header {
@@ -327,13 +335,13 @@ a.cart-item {
 }
 
 .slogan-top {
-    font-size: 1.8em;
+    font-size: 1.6em;
     text-align: center;
 }
 
 .slogan-bottom {
     font-weight: bold;
-    color: red;
+    color: #3388cc;
 }
 
 .order-product-logo {
