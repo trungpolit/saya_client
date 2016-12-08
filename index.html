@@ -11,10 +11,10 @@
     <title>saya</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
     <!-- saya references -->
-    <!--<link href="css/libs/jquery.mobile-1.4.5.css" rel="stylesheet" />-->
-    <link href="css/libs/jquery.mobile.custom.theme.css" rel="stylesheet" />
+    <link href="css/libs/jquery.mobile-1.4.5.css" rel="stylesheet" />
+    <!--<link href="css/libs/jquery.mobile.custom.theme.css" rel="stylesheet" />
     <link href="css/libs/jquery.mobile.icons-1.4.5.css" rel="stylesheet" />
-    <link href="css/libs/jquery.mobile.structure-1.4.5.css" rel="stylesheet" />
+    <link href="css/libs/jquery.mobile.structure-1.4.5.css" rel="stylesheet" />-->
     <link href="css/jquery.mobile.overridden.css" rel="stylesheet" />
     <link href="css/jqm-font-awesome/jqm-font-awesome-isvg-ipng.css" rel="stylesheet" />
     <link href="css/libs/photoswipe.css" rel="stylesheet" />
@@ -694,27 +694,27 @@
 
     <script type="text/template" id="product-item-tpl">
         <a class="ui-btn ui-btn-icon-bottom ui-icon-carat-d product-item">
-            <div class="ui-grid-a">
-                <div class="ui-block-a">
-                    <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo inline-block" data-thumb_path='<%= thumb_path %>' />
-                    <div class="inline-block">
-                        <h2><%= name %></h2>
-                        <p class="product-price">Giá: <%= price %>/<%= unit %></p>
+            <div style="overflow:hidden">
+                <div style="float:left; width:80%; overflow:hidden; word-break: break-all; word-wrap: break-word;">
+                    <div style="float:left; margin-right:5px">
+                        <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo inline-block" data-thumb_path='<%= thumb_path %>' />
                     </div>
+                    <h2 style="overflow:initial; white-space: normal !important;"><%= name %></h2>
+                    <p class="product-price" style="overflow:initial">Giá: <%= price %>/<%= unit %></p>
                 </div>
-                <div class="ui-block-b">
+                <div style="float:right; width:20%;">
+                    <span style="margin:0px" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-icon-shop ui-btn-icon-notext ui-nodisc-icon cart icon-zoom" data-item='<%= serialize %>'>Mua</span>
                 </div>
             </div>
             <div class="ui-grid-solo">
                 <div class="description"><%= description %></div>
             </div>
         </a>
-        <span data-role="button" class="ui-btn ui-btn-right ui-shadow ui-corner-all ui-icon-shop ui-btn-icon-notext ui-nodisc-icon cart icon-zoom" data-item='<%= serialize %>'>Mua</span>
     </script>
 
     <script type="text/template" id="cart-item-tpl">
         <div class="ui-grid-a">
-            <div class="ui-block-a">
+            <div class="ui-block-a" style="width:70%">
                 <a href="#product-page" class="cart-item" data-transition="slide" data-expand="#product-<%= id %>" data-category_id="<%= category_id %>">
                     <img src="<%= logo_path %>" alt="<%= name %>" class="product-logo" />
                     <br />
@@ -723,8 +723,9 @@
                     <span><%= price %>/<%= unit %></span>
                 </a>
             </div>
-            <div class="ui-block-b">
-                <input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="<%= max_qty %>" value="<%= qty %>" data-highlight="true" class="qty" data-item='<%= serialize %>' />
+            <div class="ui-block-b" style="width:30%">
+                <!--<input type="range" name="slider-<%= id %>" id="slider-<%= id %>" min="0" max="<%= max_qty %>" value="<%= qty %>" data-highlight="true" class="qty" data-item='<%= serialize %>' />-->
+                <input type="number" name="slider-<%= id %>" pattern="[0-<%= max_qty %>]" id="slider-<%= id %>" value="<%= qty %>" min="0" max="<%= max_qty %>" class="qty" data-item='<%= serialize %>' />
             </div>
         </div>
     </script>

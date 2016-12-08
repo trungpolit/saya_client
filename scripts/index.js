@@ -17,7 +17,8 @@ saya.config = {
     //serviceDomain: "http://ongas.cms/",
     //serviceDomain: "http://localhost/saya_backend/",
     //serviceDomain: "http://192.168.137.1/saya_backend/",
-    serviceDomain: "http://cms.ongas.vn/",
+    //serviceDomain: "http://cms.ongas.vn/",
+    serviceDomain: "http://cms.famion.vn/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
         name: 'settings.gz',
@@ -1196,8 +1197,10 @@ saya.CartItemView = Backbone.View.extend({
 
         if (new_qty > saya.settings.max_product_qty) {
 
-            saya.openSystemPopup(saya.settings.add_cart_than_max);
-            return;
+            //saya.openSystemPopup(saya.settings.add_cart_than_max);
+            new_qty = saya.settings.max_product_qty;
+            $self.val(new_qty);
+            //return;
         }
 
         product.save({ qty: new_qty }, {
