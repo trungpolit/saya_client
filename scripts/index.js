@@ -15,10 +15,10 @@ var saya = {};
 saya.config = {
     //serviceDomain: "http://cms.goga.mobi/",
     //serviceDomain: "http://ongas.cms/",
-    //serviceDomain: "http://localhost/saya_backend/",
+    serviceDomain: "http://localhost/saya_backend/",
     //serviceDomain: "http://192.168.137.1/saya_backend/",
     //serviceDomain: "http://cms.ongas.vn/",
-    serviceDomain: "http://cms.famion.vn/",
+    //serviceDomain: "http://cms.famion.vn/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
         name: 'settings.gz',
