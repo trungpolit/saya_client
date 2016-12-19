@@ -53,7 +53,7 @@ body {
 
 .page-title {
     font-size: 1.6em;
-    color:#3388cc;
+    color: #3388cc;
 }
 
 span.harlowsi-header {
@@ -171,9 +171,14 @@ span.tnmi {
         font-size: 1em;
     }
 
-#product-page .product-price {
+.product-price {
     white-space: normal !important;
     font-size: 1em;
+    font-weight: normal !important;
+}
+
+.product-name {
+    margin: 0px !important;
 }
 
 #product-page .ui-block-a {
@@ -450,14 +455,12 @@ a.cart-item {
 }
 
 .description img {
-    width:100% !important;
-    height:auto !important;
+    width: 100% !important;
+    height: auto !important;
 }
 
 input.qty {
-    color:red;
-    text-align:right;
-    font-weight:bold;
+    color: red;
+    text-align: right;
+    font-weight: bold;
 }
-
-
