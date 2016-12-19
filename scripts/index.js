@@ -1643,7 +1643,7 @@ saya.initialize = function () {
 
         var $slider = $('#slider-' + saya.cart_item_remove.id);
         $slider.val(saya.cart_item_remove.qty);
-        $slider.slider("refresh");
+        //$slider.slider("refresh");
         saya.cart_item_remove = {};
     });
 
