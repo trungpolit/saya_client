@@ -15,10 +15,10 @@ var saya = {};
 saya.config = {
     //serviceDomain: "http://cms.goga.mobi/",
     //serviceDomain: "http://ongas.cms/",
-    serviceDomain: "http://localhost/saya_backend/",
+    //serviceDomain: "http://localhost/saya_backend/",
     //serviceDomain: "http://192.168.137.1/saya_backend/",
     //serviceDomain: "http://cms.ongas.vn/",
-    //serviceDomain: "http://cms.famion.vn/",
+    serviceDomain: "http://cms.famion.vn/",
     serviceRoot: "app/webroot/cache/",
     serviceSetting: {
         name: 'settings.gz',
@@ -99,9 +99,9 @@ saya.initFontSize = function () {
 
 // Thiết lập giá trị mặc định settings, các thiết lập này sẽ bị ghi đè khi khởi động app
 saya.settings = {};
-saya.settings.max_product_qty = 3;
+saya.settings.max_product_qty = 50;
 saya.settings.popup_timeout = 3;
-saya.settings.add_cart_than_max = 'Số lượng sản phẩm không thể đặt vượt quá 3 sản phẩm.';
+saya.settings.add_cart_than_max = 'Số lượng sản phẩm không thể đặt vượt quá 50 sản phẩm.';
 saya.settings.not_exist_region = 'Quận/Huyện/Thị xã mà bạn đã chọn không còn tồn tại, hãy thực hiện chọn lại vùng khác.';
 saya.settings.empty_cart = 'Giỏ hàng hiện tại không chứa sản phẩm nào.';
 saya.settings.offline_network = 'Hãy bật dữ liệu mạng hoặc wifi.';
@@ -123,7 +123,7 @@ saya.settings.order_empty = 'Hiện tại, bạn chưa đặt bất cứ đơn h
 saya.settings.client_version_message = 'Đã có phiên bản ứng dụng mới với nhiều tính năng mới hấp dẫn và tiện dùng hơn. Bạn hãy cập nhật ngay nhé!';
 saya.settings.font_size = { min: 16, max: 20 };
 saya.settings.notification_ios_version_supported = 8.0;
-saya.settings.category_welcome = { "enable": 1, "text": "Mời đăng sản phẩm", color: "#3388cc", bg_hover_color: "#0047ab", "logo_path": saya.config.serviceDomain+"img/contact.png" };
+saya.settings.category_welcome = { "enable": 1, "text": "Mời đăng sản phẩm", color: "#3388cc", bg_hover_color: "#0047ab", "logo_path": saya.config.serviceDomain + "img/support.png" };
 saya.settings.category_welcome_content = "";
 
 saya.caculateCartTotalPrice = function (cart) {
@@ -1171,7 +1171,7 @@ saya.CartItemView = Backbone.View.extend({
     },
     events: {
         "change .qty": "onChange",
-        "click .cart-item": "onClick",
+        //"click .cart-item": "onClick",
     },
     onChange: function (event) {
 
@@ -1657,7 +1657,7 @@ saya.initialize = function () {
 
         var $slider = $('#slider-' + saya.cart_item_remove.id);
         $slider.val(saya.cart_item_remove.qty);
-        $slider.slider("refresh");
+        //$slider.slider("refresh");
         saya.cart_item_remove = {};
     });
 
@@ -2099,7 +2099,7 @@ saya.initialize = function () {
                     var productListViewHtml = productListView.render();
                     $toPage.find('div[role="main"]').append(productListViewHtml.el);
                     $toPage.find('ul[data-role="listview"]').listview();
-                    productListView.expand();
+                    //productListView.expand();
                 } else {
 
                     $toPage.find('div[role="main"]').html(saya.settings.empty_product_in_region);
@@ -2188,7 +2188,7 @@ saya.initialize = function () {
         } else if (page_id == 'about-page') {
 
             console.log('about-page: render data');
-            $toPage.find('div[role="main"]').html(saya.settings.about_us);
+            //$toPage.find('div[role="main"]').html(saya.settings.about_us);
         } else if (page_id == 'order-page') {
 
             console.log('order-page: render data');
